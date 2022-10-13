@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1018121390005",
+    "project_id": "prakash-spices-fsm",
+    "storage_bucket": "prakash-spices-fsm.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1018121390005:android:73d725e38a5b42f755bbfc",
+        "android_client_info": {
+          "package_name": "com.prakashspicesfsm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1018121390005-chjfbim15ltfoa0ucvichf6mqe34ullm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDAgHwYaPnO8Vr-Z4EkusmiYVD1T6VRp30"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1018121390005-chjfbim15ltfoa0ucvichf6mqe34ullm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
