@@ -83,7 +83,6 @@ class NearByShopsListAdapter(context: Context, list: List<AddShopDBModelEntity>,
                     itemView.update_address_TV.visibility = View.GONE
                 else
                     itemView.update_address_TV.visibility = View.VISIBLE*/
-
                 if (list[adapterPosition].isUploaded) {
                     if (AppUtils.isAddressUpdated == "0")
                         itemView.update_address_TV.visibility = View.GONE
