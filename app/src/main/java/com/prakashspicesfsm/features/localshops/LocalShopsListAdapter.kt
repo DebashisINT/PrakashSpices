@@ -431,7 +431,7 @@ class LocalShopsListAdapter(context: Context, list: List<AddShopDBModelEntity>, 
                 listener.onSurveyClick(list[adapterPosition].shop_id)
             }*/
 
-            if(Pref.IsBeatRouteAvailableinAttendance){
+            /*if(Pref.IsBeatRouteAvailableinAttendance){
                 if(list[adapterPosition].beat_id.equals(Pref.SelectedBeatIDFromAttend)){
                     itemView.rl_revisit_nearby_shop.visibility=View.VISIBLE
                     itemView.visit_rl.isEnabled=true
@@ -439,7 +439,7 @@ class LocalShopsListAdapter(context: Context, list: List<AddShopDBModelEntity>, 
                     itemView.rl_revisit_nearby_shop.visibility=View.GONE
                     itemView.visit_rl.isEnabled=false
                 }
-            }
+            }*/
 
 
         }
