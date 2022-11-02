@@ -120,6 +120,7 @@ import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.hbisoft.hbrecorder.HBRecorder
 import com.hbisoft.hbrecorder.HBRecorderListener
 import com.pnikosis.materialishprogress.ProgressWheel
+import com.prakashspicesfsm.features.login.model.productlistmodel.ProductListOfflineResponseModelNew
 import com.themechangeapp.pickimage.PermissionHelper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -2519,7 +2520,54 @@ class DashboardFragment : BaseFragment(), View.OnClickListener, HBRecorderListen
 
 
         //callUserConfigApi()   // calling instead of checkToCallAssignedDDListApi()
-        getBeatListApi()
+        //getBeatListApi()
+        getProductRateListApi()
+    }
+
+    private fun getProductRateListApi() {
+        if(Pref.isOrderShow){
+            XLog.d("API_Optimization getProductRateListApi Login : enable " +  "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name )
+            val repository = ProductListRepoProvider.productListProvider()
+            progress_wheel.spin()
+            BaseActivity.compositeDisposable.add(
+                repository.getProductRateOfflineListNew()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe({ result ->
+                        //val response = result as ProductListOfflineResponseModel
+                        val response = result as ProductListOfflineResponseModelNew
+                        BaseActivity.isApiInitiated = false
+                        if (response.status == NetworkConstant.SUCCESS) {
+                            val productRateList = response.product_rate_list
+                            if (productRateList != null && productRateList.size > 0) {
+                                doAsync {
+                                    AppDatabase.getDBInstance()!!.productRateDao().deleteAll()
+                                    AppDatabase.getDBInstance()?.productRateDao()?.insertAll(productRateList)
+                                    uiThread {
+                                        progress_wheel.stopSpinning()
+                                        getBeatListApi()
+                                    }
+                                }
+                            } else {
+                                progress_wheel.stopSpinning()
+                                getBeatListApi()
+                            }
+                        } else {
+                            progress_wheel.stopSpinning()
+                            getBeatListApi()
+                        }
+
+                    }, { error ->
+                        error.printStackTrace()
+                        BaseActivity.isApiInitiated = false
+                        progress_wheel.stopSpinning()
+                        getBeatListApi()
+                    })
+            )
+        }else{
+            XLog.d("API_Optimization getProductRateListApi DashFrag : disable " +  "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name )
+            getBeatListApi()
+        }
     }
 
     private fun getBeatListApi() {
