@@ -999,6 +999,11 @@ class ViewAllQuotListFragment : BaseFragment(), View.OnClickListener {
 //            cusemail.spacingAfter = 5f
 //            document.add(cusemail)
 
+            val shopPincode = Paragraph("Pincode : "+addQuotEditResult.shop_address_pincode, font)
+            shopPincode.alignment = Element.ALIGN_LEFT
+            shopPincode.spacingAfter = 5f
+            document.add(shopPincode)
+
 
             val projectName = Paragraph("Project Name : "+addQuotEditResult.project_name, font)
             projectName.alignment = Element.ALIGN_LEFT
@@ -1239,6 +1244,7 @@ class ViewAllQuotListFragment : BaseFragment(), View.OnClickListener {
             //strip_line//bar//ics
             //Hardcoded for EuroBond
             val bm1: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.ics_image)
+//            val bm1: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.footer_icon_euro)
 //            val bm1: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.bar)
             val bitmap1 = Bitmap.createScaledBitmap(bm1, 850, 120, true)
             val stream1 = ByteArrayOutputStream()

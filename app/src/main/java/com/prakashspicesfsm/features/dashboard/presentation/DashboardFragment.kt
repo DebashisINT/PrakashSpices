@@ -91,6 +91,7 @@ import com.prakashspicesfsm.features.login.api.user_config.UserConfigRepoProvide
 import com.prakashspicesfsm.features.login.model.alarmconfigmodel.AlarmConfigResponseModel
 import com.prakashspicesfsm.features.login.model.globalconfig.ConfigFetchResponseModel
 import com.prakashspicesfsm.features.login.model.mettingListModel.MeetingListResponseModel
+import com.prakashspicesfsm.features.login.model.productlistmodel.ProductListOfflineResponseModelNew
 import com.prakashspicesfsm.features.login.model.productlistmodel.ProductListResponseModel
 import com.prakashspicesfsm.features.login.model.userconfig.UserConfigResponseModel
 import com.prakashspicesfsm.features.login.presentation.LoginActivity
@@ -120,7 +121,6 @@ import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.hbisoft.hbrecorder.HBRecorder
 import com.hbisoft.hbrecorder.HBRecorderListener
 import com.pnikosis.materialishprogress.ProgressWheel
-import com.prakashspicesfsm.features.login.model.productlistmodel.ProductListOfflineResponseModelNew
 import com.themechangeapp.pickimage.PermissionHelper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -233,6 +233,8 @@ class DashboardFragment : BaseFragment(), View.OnClickListener, HBRecorderListen
     private lateinit var ll_dash_point_visit_newD   : LinearLayout
     private lateinit var ll_dash_day_end_newD   : LinearLayout
 
+    lateinit var tv_beatNamenew: TextView
+
 
 
 
@@ -256,7 +258,6 @@ class DashboardFragment : BaseFragment(), View.OnClickListener, HBRecorderListen
         val view = inflater.inflate(R.layout.fragment_dashboard_new, container, false)
         //saheli added 27-07-21
         AppUtils.changeLanguage(mContext, "en")
-
 
         println("dash_test_check initView begin "+AppUtils.getCurrentDateTime()  );
         initView(view)
@@ -614,7 +615,7 @@ class DashboardFragment : BaseFragment(), View.OnClickListener, HBRecorderListen
 
     @SuppressLint("UseRequireInsteadOfGet", "RestrictedApi")
     private fun initView(view: View?) {
-
+        tv_beatNamenew =  view!!.findViewById(R.id.tv_beatNamenew)
         cancel_timer = view!!.findViewById(R.id.cancel_timer)
         iv_screen_status = view!!.findViewById(R.id.iv_screen_status)
         tv_timer = view!!.findViewById(R.id.tv_timer)
@@ -1719,9 +1720,13 @@ class DashboardFragment : BaseFragment(), View.OnClickListener, HBRecorderListen
 
     @SuppressLint("WrongConstant")
     public fun initBottomAdapter() {
+
         if(initBottomAdapterUpdaton){
+            println("pjp_tag returning");
             return
         }
+        initBottomAdapterUpdaton = true
+
         /*val performList = ArrayList<AddShopDBModelEntity>()
         val updatedPerformList = ArrayList<AddShopDBModelEntity>()
 
@@ -1747,8 +1752,6 @@ class DashboardFragment : BaseFragment(), View.OnClickListener, HBRecorderListen
             best_performing_shop_TV.text = "Best performing " + updatedPerformList.size + " shop"
         else
             best_performing_shop_TV.text = "Best performing " + updatedPerformList.size + " shops"*/
-
-        initBottomAdapterUpdaton=true
 
         println("pjp_tag_insert")
 
@@ -1779,7 +1782,14 @@ class DashboardFragment : BaseFragment(), View.OnClickListener, HBRecorderListen
             //Pref.IsBeatRouteAvailableinAttendance=true
 
             if(!Pref.SelectedBeatIDFromAttend.equals("-1") && Pref.IsBeatRouteAvailableinAttendance && Pref.isAddAttendence){
-
+                try{
+                    tv_beatNamenew.visibility = View.VISIBLE
+                    tv_beatNamenew.text = "Beat Name: " +AppDatabase.getDBInstance()?.beatDao()?.getSingleItem(Pref.SelectedBeatIDFromAttend)!!.name
+                }catch (ex:Exception){
+                    ex.printStackTrace()
+                }
+                
+                return
                 scope.launch {
                     pjpList = loadpjpWithThread(pjpList)
                 }.invokeOnCompletion {
@@ -1817,7 +1827,12 @@ class DashboardFragment : BaseFragment(), View.OnClickListener, HBRecorderListen
                     }
                 }
 
-                /*var shopListWithBeat = AppDatabase.getDBInstance()!!.addShopEntryDao().getShopBeatWise(Pref.SelectedBeatIDFromAttend)
+                /*var shopListWithBeat:Any
+                if(Pref.IsDistributorSelectionRequiredinAttendance){
+                    shopListWithBeat = AppDatabase.getDBInstance()!!.addShopEntryDao().getShopBeatWiseDD(Pref.SelectedBeatIDFromAttend,Pref.SelectedDDIDFromAttend)
+                }else{
+                    shopListWithBeat = AppDatabase.getDBInstance()!!.addShopEntryDao().getShopBeatWise(Pref.SelectedBeatIDFromAttend)
+                }
                 if(shopListWithBeat.size>0){
                     doAsync {
                         for(l in 0..shopListWithBeat.size-1){
@@ -1842,6 +1857,8 @@ class DashboardFragment : BaseFragment(), View.OnClickListener, HBRecorderListen
                             println("pjp_tag ${obj.pjp_id}");
                         }
                         uiThread {
+                            println("pjp_tag inside uiThread ");
+
                             if (pjpList != null && pjpList.isNotEmpty()) {
                                 no_shop_tv.visibility = View.GONE
                                 rv_pjp_list.visibility = View.VISIBLE
@@ -4164,6 +4181,15 @@ class DashboardFragment : BaseFragment(), View.OnClickListener, HBRecorderListen
 
                                 if (configResponse.IsDistributorSelectionRequiredinAttendance != null)
                                     Pref.IsDistributorSelectionRequiredinAttendance = configResponse.IsDistributorSelectionRequiredinAttendance!!
+
+                                if (configResponse.IsAllowNearbyshopWithBeat != null)
+                                    Pref.IsAllowNearbyshopWithBeat = configResponse.IsAllowNearbyshopWithBeat!!
+
+                                if (configResponse.IsGSTINPANEnableInShop != null)
+                                    Pref.IsGSTINPANEnableInShop = configResponse.IsGSTINPANEnableInShop!!
+
+                                if (configResponse.IsMultipleImagesRequired != null)
+                                    Pref.IsMultipleImagesRequired = configResponse.IsMultipleImagesRequired!!
 
                             }
                             BaseActivity.isApiInitiated = false

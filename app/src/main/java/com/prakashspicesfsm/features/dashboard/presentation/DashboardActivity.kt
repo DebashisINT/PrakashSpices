@@ -179,6 +179,7 @@ import com.prakashspicesfsm.features.myprofile.presentation.MyProfileFragment
 import com.prakashspicesfsm.features.nearbyshops.api.ShopListRepositoryProvider
 import com.prakashspicesfsm.features.nearbyshops.model.ShopData
 import com.prakashspicesfsm.features.nearbyshops.model.ShopListResponse
+import com.prakashspicesfsm.features.nearbyshops.multipleattachImage.MultipleImageFragment
 import com.prakashspicesfsm.features.nearbyshops.presentation.BeatListFragment
 import com.prakashspicesfsm.features.nearbyshops.presentation.NearByShopsListFragment
 import com.prakashspicesfsm.features.nearbyshops.presentation.NewNearByShopsListFragment
@@ -337,7 +338,6 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
 
         println("load_frag " + mFragType.toString() + "     " + Pref.user_id.toString());
         //AppDatabase.getDBInstance()!!.userLocationDataDao().updateUnknownLocationTest(AppUtils.getCurrentDateForShopActi(),"Unknown",false)
-
         if (addToStack) {
             mTransaction.add(R.id.frame_layout_container, getFragInstance(mFragType, initializeObject, true)!!, mFragType.toString())
             mTransaction.addToBackStack(mFragType.toString()).commitAllowingStateLoss()
@@ -814,10 +814,10 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
         if (isTermsAndConditionsPopShow) {
             callTermsAndConditionsdApi()
         } else {
-            if (!Pref.isSeenTermsConditions)
+            if (!Pref.isSeenTermsConditions){
                 showTermsConditionsPopup()
+            }
         }
-
 
         //AlarmReceiver.setAlarm(this, 12, 11, 12345)
 
@@ -1127,7 +1127,6 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
     }
 
     private fun showTermsConditionsPopup() {
-
         if (TextUtils.isEmpty(Pref.termsConditionsText)) {
             checkToShowHomeLocationAlert()
             return
@@ -1147,6 +1146,8 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
             }
         })//.show(supportFragmentManager, "CommonDialogSingleBtn")
         termsConditionsDialog?.show(supportFragmentManager, "CommonDialogSingleBtn")
+
+
     }
 
     fun checkLocationMode() {
@@ -2823,6 +2824,9 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
                                         val attendanceList = result as AttendanceResponse
                                         if (attendanceList.status == "205") {
                                             progress_wheel.stopSpinning()
+
+
+
                                             loadFragment(FragType.AddAttendanceFragment, true, "")
                                         } else if (attendanceList.status == NetworkConstant.SUCCESS) {
                                             progress_wheel.stopSpinning()
@@ -4224,6 +4228,13 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
                 setTopBarTitle("Team Beat List")
                 setTopBarVisibility(TopBarConfig.BACK)
             }
+            FragType.MultipleImageFragment -> {
+                if (enableFragGeneration) {
+                    mFragment = MultipleImageFragment.newInstance(initializeObject)
+                }
+                setTopBarTitle("Attach Image")
+                setTopBarVisibility(TopBarConfig.BACK)
+            }
             FragType.SurveyViewFrag -> {
                 if (enableFragGeneration) {
                     mFragment = SurveyViewFrag.getInstance(initializeObject)
@@ -5448,6 +5459,7 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
          headerTV.text = title
     }
 
+    @RequiresApi(Build.VERSION_CODES.HONEYCOMB_MR1)
     private fun setTopBarVisibility(mTopBarConfig: TopBarConfig) {
         tv_noti_count.visibility = View.GONE
         when (mTopBarConfig) {
@@ -8062,6 +8074,16 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
                     }
 
                 }
+                else if (getCurrentFragType() == FragType.MultipleImageFragment) {
+                    // request for camera image
+                    getCameraImage(data)
+                    if (!TextUtils.isEmpty(filePath)) {
+//                        AppUtils.getCompressImage(filePath.toString())
+                            AppUtils.getCompressOldImage(filePath.toString(),this)
+                        (getFragment() as MultipleImageFragment).setImagecapture(filePath)
+
+                    }
+                }
                 else if (getCurrentFragType() == FragType.MyProfileFragment /*&& FTStorageUtils.IMG_URI != null*/) {
                     /*AppUtils.getCompressContentImage(FTStorageUtils.IMG_URI, this)
                     (getFragment() as MyProfileFragment).setImage(FTStorageUtils.IMG_URI)*/
@@ -8639,7 +8661,8 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
                         (getFragment() as ViewAllTAListFragment).showPickedFileFromGalleryFetch(data)
                 }
 
-            } else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            }
+            else if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
                 val result = CropImage.getActivityResult(data)
                 if (resultCode == RESULT_OK) {
                     val resultUri = result.uri
@@ -8689,6 +8712,7 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
 
                                 getAddShopPic(fileSize, resultUri)
                             }
+
                             getCurrentFragType() == FragType.ShopDetailFragment -> {
                                 //AppUtils.getCompressImage(resultUri.toString())
                                 val fileSize = AppUtils.getCompressOldImage(resultUri.toString(), this)
@@ -8780,8 +8804,28 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
                     var error = result.error
                 }
 //
-            } else if (requestCode == PermissionHelper.REQUEST_CODE_STORAGE) {
-                if (getCurrentFragType() == FragType.MyProfileFragment) {
+            }
+            else if (requestCode == PermissionHelper.REQUEST_CODE_STORAGE) {
+                if(getCurrentFragType() == FragType.MultipleImageFragment) {
+                    /*AppUtils.getCompressImage(data!!.data.toString())
+                    var newUri = data.data!!
+                    //new image compress
+                    var qlty=30
+                    var fileSize : Long = 0
+                    while((fileSize/1024)>50) {
+                        fileSize = AppUtils.getCompressOldImagev1(newUri.toString(), this, qlty)
+                    }
+                    (getFragment() as MultipleImageFragment).setImage(newUri,fileSize)
+                    //getAddMultiPic(fileSize, resultUri)
+
+                    //AppUtils.getCompressImage(data!!.data.toString())
+                    //(getFragment() as MultipleImageFragment).setImageFromPath(data.data!!)*/
+
+                    getGalleryImage(this, data)
+                    (getFragment() as MultipleImageFragment).setImageFromPath(filePath)
+
+                }
+                else if (getCurrentFragType() == FragType.MyProfileFragment) {
                     //AppUtils.getCompressContentImage(data!!.data, this)
 
                     /*getGalleryImage(this, data)
@@ -8794,10 +8838,12 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
                             .start(this)
 
                     //(getFragment() as MyProfileFragment).setImage(data.data)
-                } else if (getCurrentFragType() == FragType.MarketingPagerFragment) {
+                }
+                else if (getCurrentFragType() == FragType.MarketingPagerFragment) {
                     AppUtils.getCompressImage(data!!.data.toString())
                     (getFragment() as MarketingPagerFragment).setImage(data.data!!)
-                } else if (getCurrentFragType() == FragType.AddShopFragment) {
+                }
+                else if (getCurrentFragType() == FragType.AddShopFragment) {
 
                     XLog.d("DashboardActivity : " + " , " + " Gallery Image FilePath :" + data!!.data)
                     /*14-12-2021*/
@@ -8812,32 +8858,38 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
                                 .start(this)
                     }
 
-                } else if (getCurrentFragType() == FragType.ShopDetailFragment) {
+                }
+                else if (getCurrentFragType() == FragType.ShopDetailFragment) {
                     XLog.d("DashboardActivity : " + " , " + " Gallery Image FilePath :" + data!!.data)
                     CropImage.activity(data.data)
                             .setAspectRatio(40, 21)
                             .start(this)
-                } else if (getCurrentFragType() == FragType.AddBillingFragment) {
+                }
+                else if (getCurrentFragType() == FragType.AddBillingFragment) {
                     XLog.d("DashboardActivity : " + " , " + " Gallery Image FilePath :" + data!!.data)
                     CropImage.activity(data.data)
                             .setAspectRatio(40, 21)
                             .start(this)
-                } else if (getCurrentFragType() == FragType.AddDynamicFragment) {
+                }
+                else if (getCurrentFragType() == FragType.AddDynamicFragment) {
                     XLog.d("DashboardActivity : " + " , " + " Gallery Image FilePath :" + data!!.data)
                     CropImage.activity(data.data)
                             .setAspectRatio(40, 21)
                             .start(this)
-                } else if (getCurrentFragType() == FragType.EditDynamicFragment) {
+                }
+                else if (getCurrentFragType() == FragType.EditDynamicFragment) {
                     XLog.d("DashboardActivity : " + " , " + " Gallery Image FilePath :" + data!!.data)
                     CropImage.activity(data.data)
                             .setAspectRatio(40, 21)
                             .start(this)
-                } else if (getCurrentFragType() == FragType.AddActivityFragment) {
+                }
+                else if (getCurrentFragType() == FragType.AddActivityFragment) {
                     XLog.d("DashboardActivity : " + " , " + " Gallery Image FilePath :" + data!!.data)
                     CropImage.activity(data.data)
                             .setAspectRatio(40, 21)
                             .start(this)
-                } else if (getCurrentFragType() == FragType.EditActivityFragment) {
+                }
+                else if (getCurrentFragType() == FragType.EditActivityFragment) {
                     XLog.d("DashboardActivity : " + " , " + " Gallery Image FilePath :" + data!!.data)
                     CropImage.activity(data.data)
                             .setAspectRatio(40, 21)
@@ -8884,7 +8936,8 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
                     (getFragment() as ReimbursementFragment).setImage(filePath)
 
                     //(getFragment() as MyProfileFragment).setImage(data.data)
-                } else if (getCurrentFragType() == FragType.EditReimbursementFragment) {
+                }
+                else if (getCurrentFragType() == FragType.EditReimbursementFragment) {
                     //AppUtils.getCompressContentImage(data!!.data, this)
 
                     getGalleryImage(this, data)
@@ -8950,7 +9003,8 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
                     CropImage.activity(data.data)
                             .setAspectRatio(40, 21)
                             .start(this)
-                }else if(getCurrentFragType() == FragType.RegisTerFaceFragment){
+                }
+                else if(getCurrentFragType() == FragType.RegisTerFaceFragment){
                     CropImage.activity(data?.data)
                             .setCropShape(CropImageView.CropShape.RECTANGLE)
                             .setMinCropWindowSize(400, 400)
@@ -8959,7 +9013,8 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
                             .setAllowRotation(false)
                             .setOutputCompressQuality(100)
                             .start(this)
-                }else if(getCurrentFragType() == FragType.ProtoRegistrationFragment){
+                }
+                else if(getCurrentFragType() == FragType.ProtoRegistrationFragment){
                     // for gallary image
                     getGalleryImage(this, data)
                     if (!TextUtils.isEmpty(filePath)) {
@@ -8971,7 +9026,8 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
                         (getFragment() as ProtoRegistrationFragment).setImage(filePath)
 
                     }
-                }else if (getCurrentFragType() == FragType.SurveyFrag) {
+                }
+                else if (getCurrentFragType() == FragType.SurveyFrag) {
                     getGalleryImage(this, data)
                     (getFragment() as SurveyFrag).setImageFromPath(filePath)
                 }
@@ -8983,7 +9039,8 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
 
                 }
 
-            } else if (requestCode == REQUEST_CODE_DOCUMENT) {
+            }
+            else if (requestCode == REQUEST_CODE_DOCUMENT) {
                 try {
                     if (data != null && data.data != null) {
                         filePath = NewFileUtils.getRealPath(this@DashboardActivity, data.data)
@@ -9827,6 +9884,9 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
         addShopReqData.beat_id = addShopData.beat_id
         addShopReqData.assigned_to_shop_id = addShopData.assigned_to_shop_id
         addShopReqData.actual_address = addShopData.actual_address
+
+        addShopReqData.GSTN_Number = addShopData.gstN_Number
+        addShopReqData.ShopOwner_PAN = addShopData.shopOwner_PAN
 
         /*val addShop = AddShopRequest()
         addShop.data = addShopReqData*/

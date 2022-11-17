@@ -16,6 +16,10 @@ import android.text.TextUtils
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationManagerCompat
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
 import com.prakashspicesfsm.BuildConfig
 import com.prakashspicesfsm.R
 import com.prakashspicesfsm.app.NetworkConstant
@@ -86,12 +90,12 @@ class SplashActivity : BaseActivity(), GpsStatusDetector.GpsStatusDetectorCallBa
     //email.type = "message/rfc822"
     startActivity(Intent.createChooser(email, "Send mail..."))*/
 
-
     val receiver = ComponentName(this, AlarmBootReceiver::class.java)
         packageManager.setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP)
 
         progress_wheel = findViewById(R.id.progress_wheel)
         progress_wheel.stopSpinning()
+
 
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
@@ -119,6 +123,7 @@ class SplashActivity : BaseActivity(), GpsStatusDetector.GpsStatusDetectorCallBa
         }
         permissionCheck()
     }
+
 
 
     private fun locDesc(){

@@ -98,6 +98,9 @@ class ConfigFetchResponseModel : BaseResponse() {
     var BeatText: String = ""
     var TodaysTaskText:String = ""
     var IsDistributorSelectionRequiredinAttendance:Boolean? = null
+    var IsAllowNearbyshopWithBeat:Boolean? = null
+    var IsGSTINPANEnableInShop:Boolean? = null
+    var IsMultipleImagesRequired:Boolean? = null
 
 
 

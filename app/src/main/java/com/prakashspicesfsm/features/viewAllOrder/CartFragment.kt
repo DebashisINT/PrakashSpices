@@ -572,11 +572,11 @@ class CartFragment : BaseFragment(), View.OnClickListener {
             }
 
             for (i in qtyList.indices) {
-//                if (qtyList[i].length > 1 && qtyList[i].startsWith("0")) {
+                //if (qtyList[i].length > 1 && qtyList[i].startsWith("0")) {
                 if (qtyList[i].length > 1 && qtyList[i].equals("0")) {
                     (mContext as DashboardActivity).showSnackMessage(getString(R.string.enter_valid_qty))
                     return
-//                } else if (qtyList[i].toInt() == 0) {
+                //} else if (qtyList[i].toInt() == 0) {
                 } else if (qtyList[i].toDouble() == 0.0) {
                     tempQtyList.remove(qtyList[i])
                 }
