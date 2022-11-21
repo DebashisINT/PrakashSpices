@@ -901,16 +901,38 @@ class OrderTypeListFragment : BaseFragment(), View.OnClickListener {
                 }
 
                 selectedProductList.add(product!!)
-                (mContext as DashboardActivity).qtyList.add("0")
+                if(!Pref.IsProductRateQtyDialog){
+                    (mContext as DashboardActivity).qtyList.add("0")
+                }
                 (mContext as DashboardActivity).schemaqtyList.add("0")
 
                 (mContext as DashboardActivity).mrpList.add("0.00")
 
-                if (!Pref.isRateNotEditable && false){
+
+                //new work rate qty start
+                if(Pref.IsProductRateQtyDialog){
+                var productRateStr = ""
+                if (productRateList != null && productRateList!!.size > 0) {
+                    for (i in productRateList!!.indices) {
+                        if (productRateList!![i].product_id.toInt() == product.id) {
+                            productRateStr = productRateList!![i].product_id.toInt().toString()
+                            break
+                        }
+                    }
+                }
+                (mContext as DashboardActivity).schemarateList.add("0.00")
+                DialogProductRateQty.getInstance(product.product_name!!+"~$productRateStr").show((mContext as DashboardActivity).supportFragmentManager, "")
+                }
+                //new work rate qty end
+
+
+
+                if(!Pref.IsProductRateQtyDialog){
+                    if (!Pref.isRateNotEditable && false){
                     (mContext as DashboardActivity).rateList.add("0.00")
                     (mContext as DashboardActivity).schemarateList.add("0.00")
                 }
-                else {
+                    else {
                     if (Pref.isRateOnline) {
                         if (productRateList != null && productRateList!!.size > 0) {
                             for (i in productRateList!!.indices) {
@@ -951,6 +973,7 @@ class OrderTypeListFragment : BaseFragment(), View.OnClickListener {
                             (mContext as DashboardActivity).rateList.add("0.00")
                     }
                     (mContext as DashboardActivity).schemarateList.add("0.00")
+                }
                 }
                 //(mContext as DashboardActivity).loadFragment(FragType.CartFragment, true, selectedProductList)
 

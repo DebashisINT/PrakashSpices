@@ -474,5 +474,7 @@ object Pref : PreferenceHolder() {
 
     var IsMultipleImagesRequired:Boolean by bindToPreferenceField(false, "IsMultipleImagesRequired")
 
+    var IsProductRateQtyDialog:Boolean by bindToPreferenceField(true, "IsProductRateQtyDialog")
+
 
 }

@@ -597,6 +597,28 @@ class CartAdapter(private val context: Context, private val selectedProductList:
 
                 //(context as DashboardActivity).totalPrice.add(totalPrice.toDouble())
 
+
+
+
+                //new work rate qty end
+                if(Pref.IsProductRateQtyDialog){
+                    itemView.et_qty.setText(((context as DashboardActivity).qtyList[adapterPosition]))
+                }
+                itemView.et_qty.addTextChangedListener(CustomSpecialTextWatcher(itemView.et_qty, 5, 2, object : CustomSpecialTextWatcher.GetCustomTextChangeListener {
+                    override fun beforeTextChange(text: String) {
+                        previousQty = text
+                    }
+
+                    override fun customTextChange(text: String) {
+                        val qty = text
+                        if(qty.equals("0"))
+                                return
+                        (context as DashboardActivity).qtyList[adapterPosition] = qty
+                        listener.onEdit(adapterPosition)
+
+                    }
+                }))
+
             } catch (e: Exception) {
                 e.printStackTrace()
             }
