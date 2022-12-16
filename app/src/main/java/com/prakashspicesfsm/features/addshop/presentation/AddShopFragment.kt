@@ -331,6 +331,7 @@ class AddShopFragment : BaseFragment(), View.OnClickListener {
     private lateinit var whatsapp_number_EDT: AppCustomEditText
 
     private lateinit var ll_feedback: LinearLayout
+    private lateinit var tv_feedback_asterisk_mark: AppCustomTextView
 
 
 
@@ -468,7 +469,8 @@ class AddShopFragment : BaseFragment(), View.OnClickListener {
 
 
             if (AppUtils.mLocation != null) {
-                if (AppUtils.mLocation!!.accuracy <= 100) {
+                if (AppUtils.mLocation!!.accuracy <= Pref.gpsAccuracy.toInt()) {
+                //if (AppUtils.mLocation!!.accuracy <= 1) {
                     getAddressFromLatLng(AppUtils.mLocation!!)
                 } else {
                     XLog.d("======Saved current location is inaccurate (Add Shop)========")
@@ -505,18 +507,18 @@ class AddShopFragment : BaseFragment(), View.OnClickListener {
                     }
 
                     override fun onNewLocationAvailable(location: Location) {
+                        isGetLocation = -1
                         if (isGetLocation == -1) {
                             isGetLocation = 0
                             progress_wheel.stopSpinning()
                             try {
-                                if (location != null && location.accuracy > 100) {
+                                if (location != null && location.accuracy > Pref.gpsAccuracy.toInt()) {
                                     if (dialog == null) {
                                         dialog = AccuracyIssueDialog()
                                         dialog?.show((mContext as DashboardActivity).supportFragmentManager, "AccuracyIssueDialog")
                                     } else {
                                         dialog?.dismissAllowingStateLoss()
                                         dialog?.show((mContext as DashboardActivity).supportFragmentManager, "AccuracyIssueDialog")
-
                                     }
                                     return
                                 }
@@ -534,7 +536,7 @@ class AddShopFragment : BaseFragment(), View.OnClickListener {
                     }
                 })
 
-        val t = Timer()
+        /*val t = Timer()
         t.schedule(object : TimerTask() {
             override fun run() {
                 try {
@@ -548,7 +550,7 @@ class AddShopFragment : BaseFragment(), View.OnClickListener {
                     e.printStackTrace()
                 }
             }
-        }, 15000)
+        }, 15000)*/
     }
 
     private fun getAddressFromLatLng(location: Location) {
@@ -723,6 +725,7 @@ class AddShopFragment : BaseFragment(), View.OnClickListener {
         whatsapp_number_EDT =  view.findViewById(R.id.whatsapp_number_EDT)
 
         ll_feedback =  view.findViewById(R.id.ll_feedback)
+        tv_feedback_asterisk_mark =  view.findViewById(R.id.tv_feedback_asterisk_mark)
 
 
         tv_select_beat.hint = "Select " + "${Pref.beatText}"
@@ -1463,6 +1466,13 @@ class AddShopFragment : BaseFragment(), View.OnClickListener {
                 ll_feedback.visibility = View.GONE
             }
 
+              if(Pref.IsFeedbackMandatoryforNewShop){
+                  tv_feedback_asterisk_mark.visibility = View.VISIBLE
+            }
+            else{
+                  tv_feedback_asterisk_mark.visibility = View.GONE
+            }
+
         }
 
         /*if (Pref.isReplaceShopText)
@@ -1879,6 +1889,13 @@ class AddShopFragment : BaseFragment(), View.OnClickListener {
                                 XLog.d("AddShop : " + ", SHOP: " + addShop.shop_name + ", RESPONSE:" + result.message)
                                 if (addShopResult.status == NetworkConstant.SUCCESS) {
                                     AppDatabase.getDBInstance()!!.addShopEntryDao().updateIsUploaded(true, addShop.shop_id)
+                                    if(AppUtils.isOnline(mContext)){
+//                                        if(Pref.isMultipleVisitEnable)
+                                            AppDatabase.getDBInstance()!!.shopActivityDao().updateIsUploaded(true, addShop.shop_id!!,AppUtils.getCurrentDateForShopActi())
+
+                                    }
+
+
                                     //callShopActivitySubmit(addShop.shop_id!!)
                                     progress_wheel.stopSpinning()
 //                                (mContext as DashboardActivity).showSnackMessage("SUCCESS")
@@ -5244,6 +5261,7 @@ class AddShopFragment : BaseFragment(), View.OnClickListener {
         }
 
 
+
         if(Pref.IsnewleadtypeforRuby && addShopData.type.equals("16")){
             ownerNumber.setText(leadContactNumber.text.toString())
             ownerName.setText(agency_name_EDT.text.toString())
@@ -5279,6 +5297,15 @@ class AddShopFragment : BaseFragment(), View.OnClickListener {
             (mContext as DashboardActivity).showSnackMessage(getString(R.string.error_enter_valid_phn_no), 3000)
             BaseActivity.isApiInitiated = false
             return
+        }
+
+        if (Pref.IsFeedbackMandatoryforNewShop){
+            if (TextUtils.isEmpty(feedback_EDT.text.toString().trim().toString()) && feedback_EDT.text!!.isBlank()) {
+                BaseActivity.isApiInitiated = false
+                openDialogPopup("Hi ${Pref.user_name} !","Please provide Feedback")
+                return
+            }
+
         }
 
         if (addShopData.type == "5") {
@@ -5434,6 +5461,10 @@ class AddShopFragment : BaseFragment(), View.OnClickListener {
                 return
             } else
                 shopDataModel.chemist_pincode = chemist_pin_code_EDT.text.toString().trim()
+
+
+
+
 
             saveDataToDb()
             return
@@ -6724,6 +6755,13 @@ class AddShopFragment : BaseFragment(), View.OnClickListener {
             }
             else{
                 ll_feedback.visibility = View.GONE
+            }
+
+            if(Pref.IsFeedbackMandatoryforNewShop){
+                tv_feedback_asterisk_mark.visibility = View.VISIBLE
+            }
+            else{
+                tv_feedback_asterisk_mark.visibility = View.GONE
             }
 
             if (Pref.isAreaVisible)

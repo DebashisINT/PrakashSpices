@@ -176,13 +176,16 @@ class CartAdapter(private val context: Context, private val selectedProductList:
                         if (Pref.isRateNotEditable && list != null && list.size > 0) {
                             itemView.et_rate.isEnabled = false
 //                            itemView.scheme_et_rate.isEnabled = false
-                            itemView.et_rate.setText(((context as DashboardActivity).rateList[adapterPosition]))
+//                            itemView.et_rate.setText(((context as DashboardActivity).rateList[adapterPosition]))
+                            itemView.et_rate.setText(String.format("%.2f", ((context as DashboardActivity).rateList[adapterPosition].toDouble())))
+
 //                            itemView.scheme_et_rate.setText(((context as DashboardActivity).schemarateList[adapterPosition]))
                         } else {
                             itemView.et_rate.isEnabled = true
 //                            itemView.scheme_et_rate.isEnabled = true
                             if ((context as DashboardActivity).rateList[adapterPosition] > "0.00")
-                                itemView.et_rate.setText(((context as DashboardActivity).rateList[adapterPosition]/*.toFloat().toInt()*/).toString())
+                                itemView.et_rate.setText(String.format("%.2f", ((context as DashboardActivity).rateList[adapterPosition].toDouble())))
+//                                itemView.et_rate.setText(((context as DashboardActivity).rateList[adapterPosition]/*.toFloat().toInt()*/).toString())
                             else
                                 itemView.et_rate.setText("")
 
@@ -596,28 +599,6 @@ class CartAdapter(private val context: Context, private val selectedProductList:
                 })*/
 
                 //(context as DashboardActivity).totalPrice.add(totalPrice.toDouble())
-
-
-
-
-                //new work rate qty end
-                if(Pref.IsProductRateQtyDialog){
-                    itemView.et_qty.setText(((context as DashboardActivity).qtyList[adapterPosition]))
-                }
-                itemView.et_qty.addTextChangedListener(CustomSpecialTextWatcher(itemView.et_qty, 5, 2, object : CustomSpecialTextWatcher.GetCustomTextChangeListener {
-                    override fun beforeTextChange(text: String) {
-                        previousQty = text
-                    }
-
-                    override fun customTextChange(text: String) {
-                        val qty = text
-                        if(qty.equals("0"))
-                                return
-                        (context as DashboardActivity).qtyList[adapterPosition] = qty
-                        listener.onEdit(adapterPosition)
-
-                    }
-                }))
 
             } catch (e: Exception) {
                 e.printStackTrace()

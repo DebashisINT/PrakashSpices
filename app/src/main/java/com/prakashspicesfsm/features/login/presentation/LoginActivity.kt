@@ -529,6 +529,34 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
                                 if (configResponse.IsMultipleImagesRequired != null)
                                     Pref.IsMultipleImagesRequired = configResponse.IsMultipleImagesRequired!!
 
+                                if (configResponse.IsALLDDRequiredforAttendance != null)
+                                    Pref.IsALLDDRequiredforAttendance = configResponse.IsALLDDRequiredforAttendance!!
+
+                                if (configResponse.IsShowNewOrderCart != null)
+                                    Pref.IsShowNewOrderCart = configResponse.IsShowNewOrderCart!!
+
+                                if (configResponse.IsmanualInOutTimeRequired != null)
+                                    Pref.IsmanualInOutTimeRequired = configResponse.IsmanualInOutTimeRequired!!
+
+                                if (!TextUtils.isEmpty(configResponse.surveytext))
+                                    Pref.surveytext = configResponse.surveytext
+
+                                if (configResponse.IsDiscountInOrder != null)
+                                    Pref.IsDiscountInOrder = configResponse.IsDiscountInOrder!!
+
+                                if (configResponse.IsViewMRPInOrder != null)
+                                    Pref.IsViewMRPInOrder = configResponse.IsViewMRPInOrder!!
+
+                                if (configResponse.IsShowStateInTeam != null)
+                                    Pref.IsShowStateInTeam = configResponse.IsShowStateInTeam!!
+
+                                if (configResponse.IsShowBranchInTeam != null)
+                                    Pref.IsShowBranchInTeam = configResponse.IsShowBranchInTeam!!
+
+                                if (configResponse.IsShowDesignationInTeam != null)
+                                    Pref.IsShowDesignationInTeam = configResponse.IsShowDesignationInTeam!!
+
+
 
                                 /*if (configResponse.willShowUpdateDayPlan != null)
                                     Pref.willShowUpdateDayPlan = configResponse.willShowUpdateDayPlan!!
@@ -3286,10 +3314,17 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
                     if (fingerprintDialog != null && fingerprintDialog?.isVisible!!) {
                         fingerprintDialog?.dismiss()
 
-                        if (Pref.isSelfieMandatoryForAttendance)
-                            showSelfieDialog()
-                        else
+                        if (Pref.isSelfieMandatoryForAttendance){
+                            if(Pref.IsLoginSelfieRequired){
+                                showSelfieDialog()
+                            }else{
+                                prapareLogin(this@LoginActivity)
+                            }
+                        }
+                        else{
                             prapareLogin(this@LoginActivity)
+                        }
+
                     }
                 }
 
@@ -3775,15 +3810,28 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
                                             fingerprintDialog = FingerprintDialog()
                                             fingerprintDialog?.show(supportFragmentManager, "")
                                         } else {
-                                            if (Pref.isSelfieMandatoryForAttendance)
-                                                showSelfieDialog()
-                                            else
+                                            if (Pref.isSelfieMandatoryForAttendance){
+                                                if(Pref.IsLoginSelfieRequired){
+                                                    showSelfieDialog()
+                                                }else{
+                                                    prapareLogin(this@LoginActivity)
+                                                }
+                                            }
+                                            else{
                                                 prapareLogin(this@LoginActivity)
+                                            }
                                         }
-                                    } else if (Pref.isSelfieMandatoryForAttendance)
-                                        showSelfieDialog()
-                                    else
+                                    }
+                                    else if (Pref.isSelfieMandatoryForAttendance){
+                                        if(Pref.IsLoginSelfieRequired){
+                                            showSelfieDialog()
+                                        }else{
+                                            prapareLogin(this@LoginActivity)
+                                        }
+                                    }
+                                    else {
                                         prapareLogin(this@LoginActivity)
+                                    }
                                 } else
                                     prapareLogin(this@LoginActivity)
 
@@ -3880,15 +3928,28 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
         isApiInitiated = true
         XLog.d("LoginLocationRequest : " + "\n, IMEI :" + Pref.imei + ", Time :" + AppUtils.getCurrentDateTime() + ", Version :" + AppUtils.getVersionName(this))
 //        progress_wheel.spin()
+
+        try{
+            XLog.d("lat ${Pref.latitude} lon ${Pref.longitude} " + AppUtils.getVersionName(this))
+        }catch (ex:Exception){
+            ex.printStackTrace()
+            XLog.d("lat ${ex.message} lon ${ex.message} " + AppUtils.getVersionName(this))
+        }
+
         if (Pref.latitude != null && Pref.latitude!!.trim() != "") {
             println("xyz - callApi started" + AppUtils.getCurrentDateTime());
             callApi(username_EDT.text.toString().trim(), password_EDT.text.toString())
         } else {
             val gpsTracker = GPSTracker(this)
+            XLog.d("gpsTracker ${gpsTracker.isGPSTrackingEnabled} " + AppUtils.getVersionName(this))
             if (gpsTracker.isGPSTrackingEnabled) {
                 Pref.latitude = gpsTracker.getLatitude().toString()
                 Pref.longitude = gpsTracker.getLongitude().toString()
                 println("xyz - callApi started" + AppUtils.getCurrentDateTime());
+                callApi(username_EDT.text.toString().trim(), password_EDT.text.toString().trim())
+            }else{
+                Pref.latitude = Pref.current_latitude
+                Pref.longitude = Pref.current_longitude
                 callApi(username_EDT.text.toString().trim(), password_EDT.text.toString().trim())
             }
 //            SingleShotLocationProvider.requestSingleUpdate(context,
@@ -5221,11 +5282,13 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
                                                 if (!TextUtils.isEmpty(response.getconfigure?.get(i)?.Value)) {
                                                     Pref.currentLocationNotificationMins = response.getconfigure!![i].Value!!
                                                 }
-                                            } else if (response.getconfigure!![i].Key.equals("isMultipleVisitEnable", ignoreCase = true)) {
+                                            }
+                                            else if (response.getconfigure!![i].Key.equals("isMultipleVisitEnable", ignoreCase = true)) {
                                                 if (!TextUtils.isEmpty(response.getconfigure?.get(i)?.Value)) {
                                                     Pref.isMultipleVisitEnable = response.getconfigure!![i].Value!! == "1"
                                                 }
-                                            } else if (response.getconfigure!![i].Key.equals("isShowVisitRemarks", ignoreCase = true)) {
+                                            }
+                                            else if (response.getconfigure!![i].Key.equals("isShowVisitRemarks", ignoreCase = true)) {
                                                 if (!TextUtils.isEmpty(response.getconfigure?.get(i)?.Value)) {
                                                     Pref.isShowVisitRemarks = response.getconfigure!![i].Value!! == "1"
                                                 }
@@ -5778,6 +5841,17 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
                                                     Pref.IsFeedbackAvailableInShop = response.getconfigure!![i].Value == "1"
                                                 }
                                             }
+                                                 else if (response.getconfigure!![i].Key.equals("IsFeedbackMandatoryforNewShop", ignoreCase = true)) {
+                                                if (!TextUtils.isEmpty(response.getconfigure?.get(i)?.Value)) {
+                                                    Pref.IsFeedbackMandatoryforNewShop = response.getconfigure!![i].Value == "1"
+                                                }
+                                            }
+
+                                            else if (response.getconfigure!![i].Key.equals("IsLoginSelfieRequired", ignoreCase = true)) {
+                                                if (!TextUtils.isEmpty(response.getconfigure?.get(i)?.Value)) {
+                                                    Pref.IsLoginSelfieRequired = response.getconfigure!![i].Value == "1"
+                                                }
+                                            }
 
                                             else if (response.getconfigure!![i].Key.equals("IsAllowBreakageTracking", ignoreCase = true)) {
                                                 if (!TextUtils.isEmpty(response.getconfigure?.get(i)?.Value)) {
@@ -5833,6 +5907,16 @@ class LoginActivity : BaseActivity(), View.OnClickListener, LocationListener {
                                                 }catch (e: Exception) {
                                                     e.printStackTrace()
                                                     Pref.GPSNetworkIntervalMins = "0"
+                                                }
+                                            }
+                                            else if (response.getconfigure!![i].Key.equals("IsJointVisitEnable", ignoreCase = true)) {
+                                                if (!TextUtils.isEmpty(response.getconfigure?.get(i)?.Value)) {
+                                                    Pref.IsJointVisitEnable = response.getconfigure!![i].Value == "1"
+                                                }
+                                            }
+                                            else if (response.getconfigure!![i].Key.equals("IsShowAllEmployeeforJointVisit", ignoreCase = true)) {
+                                                if (!TextUtils.isEmpty(response.getconfigure?.get(i)?.Value)) {
+                                                    Pref.IsShowAllEmployeeforJointVisit = response.getconfigure!![i].Value == "1"
                                                 }
                                             }
 

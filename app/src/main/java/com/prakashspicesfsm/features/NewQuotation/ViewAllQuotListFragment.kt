@@ -898,7 +898,8 @@ class ViewAllQuotListFragment : BaseFragment(), View.OnClickListener {
             var font1Big: Font = Font(Font.FontFamily.HELVETICA, 10f, Font.NORMAL)
             var font2Big: Font = Font(Font.FontFamily.HELVETICA, 9f, Font.NORMAL)
             var font1small: Font = Font(Font.FontFamily.HELVETICA, 8f, Font.NORMAL)
-            val grayFront = Font(Font.FontFamily.HELVETICA, 10f, Font.NORMAL, BaseColor.GRAY)
+//            val grayFront = Font(Font.FontFamily.HELVETICA, 10f, Font.NORMAL, BaseColor.GRAY)
+            val grayFront = Font(Font.FontFamily.HELVETICA, 10f, Font.NORMAL, BaseColor.BLACK)
 
 
             //image add
@@ -1221,7 +1222,7 @@ class ViewAllQuotListFragment : BaseFragment(), View.OnClickListener {
             document.add(salesmanDes)
 
             //val salesmanphone = Paragraph(addQuotEditResult.salesman_phone_no, fontB1)
-            val salesmanphone = Paragraph(addQuotEditResult.salesman_login_id, fontB1)
+            val salesmanphone = Paragraph("Mob : " +addQuotEditResult.salesman_login_id, fontB1)
             salesmanphone.alignment = Element.ALIGN_LEFT
             salesmanphone.spacingAfter =  2f
             document.add(salesmanphone)
@@ -1366,7 +1367,7 @@ class ViewAllQuotListFragment : BaseFragment(), View.OnClickListener {
             }*/
 
             // Hardcoded for EuroBond
-//            val m = Mail("eurobondacp02@gmail.com", "nuqfrpmdjyckkukl")
+            //val m = Mail("eurobondacp02@gmail.com", "nuqfrpmdjyckkukl")
             val m = Mail("saheli.bhattacharjee@indusnet.co.in", "@Intsaheli22")
             val toArr = arrayOf("saheli.bhattacharjee@indusnet.co.in","suman.bachar@indusnet.co.in","suman.roy@indusnet.co.in")
 //            val toArr = arrayOf("sales1@eurobondacp.com", "sales@eurobondacp.com")

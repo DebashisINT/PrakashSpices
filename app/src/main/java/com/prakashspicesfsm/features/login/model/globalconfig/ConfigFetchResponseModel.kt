@@ -101,6 +101,16 @@ class ConfigFetchResponseModel : BaseResponse() {
     var IsAllowNearbyshopWithBeat:Boolean? = null
     var IsGSTINPANEnableInShop:Boolean? = null
     var IsMultipleImagesRequired:Boolean? = null
+    var IsALLDDRequiredforAttendance:Boolean? = null
+
+    var IsShowNewOrderCart:Boolean? = null
+    var IsmanualInOutTimeRequired:Boolean? = null
+    var surveytext: String = ""
+    var IsDiscountInOrder:Boolean? = null
+    var IsViewMRPInOrder:Boolean? = null
+    var IsShowStateInTeam:Boolean? = null
+    var IsShowBranchInTeam:Boolean? = null
+    var IsShowDesignationInTeam:Boolean? = null
 
 
 

@@ -465,7 +465,8 @@ class DistributorwiseorderlistFragment : BaseFragment(), View.OnClickListener {
                     srNo = (j + 1).toString() + " "
                     item = tempProductObj.get(j).item_desc + "       "
                     qty = tempProductObj.get(j).qty + " "
-                    unit = "KG" + " "
+                    //unit = "KG" + " "
+                    unit = tempProductObj.get(j).unit+ " "
                     rate =
                         getString(R.string.rupee_symbol_with_space) + " " + tempProductObj.get(j).rate + " "
                     amount =

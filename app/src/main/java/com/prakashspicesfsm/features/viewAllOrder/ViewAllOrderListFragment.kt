@@ -133,6 +133,7 @@ class ViewAllOrderListFragment : BaseFragment(), View.OnClickListener {
         val view = inflater.inflate(R.layout.fragment_view_all_order_list, container, false)
         initView(view)
 
+
         AppUtils.stockStatus = 0
 
         val list = AppDatabase.getDBInstance()!!.orderDetailsListDao().getAll()
@@ -301,6 +302,7 @@ class ViewAllOrderListFragment : BaseFragment(), View.OnClickListener {
 
 
     private fun setData() {
+//        progress_wheel.stopSpinning()
         try {
             //generateOrderListDate()
 
@@ -763,8 +765,11 @@ class ViewAllOrderListFragment : BaseFragment(), View.OnClickListener {
 
                     if (!Pref.isAddAttendence)
                         (mContext as DashboardActivity).checkToShowAddAttendanceAlert()
-                    else
+                    else{
+                        progress_wheel.spin()
                         (mContext as DashboardActivity).loadFragment(FragType.OrderTypeListFragment, true, shopId)
+                    }
+
 
 
                 } catch (e: Exception) {
@@ -2663,6 +2668,7 @@ class ViewAllOrderListFragment : BaseFragment(), View.OnClickListener {
 
 
     fun updateList() {
+        progress_wheel.stopSpinning()
         viewAllOrderList = AppDatabase.getDBInstance()!!.orderDetailsListDao().getListAccordingToShopId(shopId) as ArrayList<OrderDetailsListEntity>
 
 

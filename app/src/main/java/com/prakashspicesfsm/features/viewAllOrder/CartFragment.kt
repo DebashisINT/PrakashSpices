@@ -565,7 +565,9 @@ class CartFragment : BaseFragment(), View.OnClickListener {
                 if (rateList[i].endsWith(".")) {
                     (mContext as DashboardActivity).showSnackMessage(getString(R.string.enter_valid_rate))
                     return
-                } else if (rateList[i].toDouble() == 0.00) {
+                }
+
+                else if (rateList[i].toDouble() == 0.00) {
                     if (AppUtils.stockStatus == 0)
                         tempRateList.remove(rateList[i])
                 }

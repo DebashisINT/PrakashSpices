@@ -603,6 +603,7 @@
                             android:inputType="text"
                             android:singleLine="true"
                             android:textSize="@dimen/_13sdp"
+                            android:maxLength="50"
                             app:theme="@style/EvoEditTextTheme" />
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -1276,6 +1277,7 @@
                             android:imeOptions="actionNext"
                             android:inputType="text"
                             android:singleLine="true"
+                            android:maxLength="50"
                             android:textSize="@dimen/_13sdp"
                             app:theme="@style/EvoEditTextTheme" />
                     </com.google.android.material.textfield.TextInputLayout>
@@ -3760,6 +3762,7 @@
                     android:orientation="horizontal">
 
                     <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/iv_feed_icon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
@@ -3768,11 +3771,14 @@
                         android:contentDescription="@null"
                         app:srcCompat="@drawable/ic_feedback" />
 
+
+
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/feedback_TL"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
+                        android:layout_weight="1"
                         android:gravity="center_vertical"
                         android:textColorHint="@color/light_gray"
                         app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
@@ -3788,7 +3794,20 @@
                             android:singleLine="true"
                             android:textSize="@dimen/_13sdp"
                             app:theme="@style/EvoEditTextTheme" />
+
+
                     </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.prakashspicesfsm.widgets.AppCustomTextView
+                        android:id="@+id/tv_feedback_asterisk_mark"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:paddingTop="@dimen/_7sdp"
+                        android:text="@string/mandatory_mark"
+                        android:textColor="@color/red"
+                        android:textSize="@dimen/_15sdp" />
                 </LinearLayout>
 
                 <RelativeLayout

@@ -2,6 +2,9 @@ package com.prakashspicesfsm;
 
 import com.prakashspicesfsm.features.lead.model.CustomerListReq;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class CustomStatic {
     public static Boolean IsFaceRec=false;
     public static String FaceUrl="";
@@ -53,5 +56,12 @@ public class CustomStatic {
     public static Boolean IsCollectionViewFromTeam = false;
     public static Boolean IsBreakageViewFromTeam = false;
     public static String BreakageViewFromTeam_Name = "";
+
+    public static String QutoNoFromNoti = "";
+
+
+    public static HashMap<Integer,String> productQtyEdi = new HashMap<>();
+    public static HashMap<Integer,String> productRateEdi = new HashMap<>();
+    public static ArrayList<Integer> productAddedID = new ArrayList<>();
 
 }

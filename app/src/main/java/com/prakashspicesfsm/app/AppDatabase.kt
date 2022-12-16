@@ -58,7 +58,7 @@ import com.prakashspicesfsm.features.login.*
         QuestionEntity::class, QuestionSubmitEntity::class, AddShopSecondaryImgEntity::class, ReturnDetailsEntity::class, ReturnProductListEntity::class, UserWiseLeaveListEntity::class, ShopFeedbackEntity::class, ShopFeedbackTempEntity::class, LeadActivityEntity::class,
         ShopDtlsTeamEntity::class, CollDtlsTeamEntity::class, BillDtlsTeamEntity::class, OrderDtlsTeamEntity::class,
         TeamAllShopDBModelEntity::class, DistWiseOrderTblEntity::class, NewGpsStatusEntity::class),
-        version = 2, exportSchema = false)
+        version = 3, exportSchema = false)
 @TypeConverters(DateConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun addShopEntryDao(): AddShopDao
@@ -203,9 +203,7 @@ abstract class AppDatabase : RoomDatabase() {
                         // allow queries on the main thread.
                         // Don't do this on a real app! See PersistenceBasicSample for an example.
                         .allowMainThreadQueries()
-                        .addMigrations(
-                            MIGRATION_1_2
-                        )
+                        .addMigrations(MIGRATION_1_2,MIGRATION_2_3,)
 //                        .fallbackToDestructiveMigration()
                         .build()
             }
@@ -220,7 +218,6 @@ abstract class AppDatabase : RoomDatabase() {
             INSTANCE = null
         }
 
-
         val MIGRATION_1_2: Migration = object : Migration(1, 2) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 database.execSQL("alter table shop_detail ADD COLUMN GSTN_Number TEXT")
@@ -232,8 +229,18 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
 
+        val MIGRATION_2_3: Migration = object : Migration(2, 3) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("alter table product_list ADD COLUMN product_mrp_show TEXT")
+                database.execSQL("alter table product_list ADD COLUMN product_discount_show TEXT")
+            }
+        }
+
 
     }
+
+
+//}
 
 
 }

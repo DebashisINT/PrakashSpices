@@ -17,7 +17,10 @@ data class TeamListDataModel(var user_id: String = "",
                              var super_id: String = "",
                              var super_name: String = "",
                              var isLeavePending: Boolean = false,
-                             var isLeaveApplied: Boolean = false) : Serializable
+                             var isLeaveApplied: Boolean = false,
+                             var State: String = "",
+                             var Branch: String = "",
+                             var Designation: String = "") : Serializable
 
 
 data class TeamShopListResponseModel(var team_struct: String? = null,
