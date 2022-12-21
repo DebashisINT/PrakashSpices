@@ -26,6 +26,7 @@ interface ShopActivityDao {
     @Query("update shop_activity set isUploaded=:isUploaded where shopid=:shopId and date=:date")
     fun updateIsUploaded(isUploaded: Boolean, shopId: String, date: String)
 
+
     @Query("Select duration_spent from shop_activity where shopid=:shopId and date=:date")
     fun getTimeDurationForDayOfShop(shopId: String, date: String): String
 
@@ -52,6 +53,9 @@ interface ShopActivityDao {
 
     @Query("Select * from shop_activity where shopid=:shopId and date=:date")
     fun getShopForDay(shopId: String, date: String): List<ShopActivityEntity>
+
+    @Query("Select * from shop_activity where shopid=:shopId and date=:date and isUploaded=:isUploaded")
+    fun getShopForDayisUploaded(shopId: String, date: String,isUploaded:Boolean): List<ShopActivityEntity>
 
     @Query("Select * from shop_activity where shopid=:shopId and date=:date and isDurationCalculated=:isDurationCalculated")
     fun getShopForDayDurationWise(shopId: String, date: String, isDurationCalculated: Boolean): List<ShopActivityEntity>
@@ -101,6 +105,9 @@ interface ShopActivityDao {
 
     @Query("update shop_activity set isUploaded=:isUploaded where shopid=:shopId and date=:date")
     fun updateisUploaded(isUploaded: Boolean, shopId: String, date: String)
+
+    @Query("update shop_activity set feedback=:feedback,next_visit_date=:next_visit_date where shopid=:shopId and date=:date")
+    fun updateFeedbackVisitdate(feedback:String,next_visit_date:String,shopId: String, date: String)
 
     @Query("Select shopid from shop_activity where shopid=:shopId and date=:date")
     fun isShopActivityAvailable(shopId: String, date: String): Boolean

@@ -25,7 +25,6 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,7 +33,6 @@ import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.borax12.materialdaterangepicker.date.DatePickerDialog
-import com.demo.features.addAttendence.DDAssignedWiseBeatListCustomDialog
 import com.prakashspicesfsm.*
 import com.prakashspicesfsm.Customdialog.CustomDialog
 import com.prakashspicesfsm.Customdialog.OnDialogCustomClickListener
@@ -53,6 +51,7 @@ import com.prakashspicesfsm.faceRec.FaceStartActivity
 import com.prakashspicesfsm.faceRec.FaceStartActivity.detector
 import com.prakashspicesfsm.faceRec.tflite.SimilarityClassifier.Recognition
 import com.prakashspicesfsm.faceRec.tflite.TFLiteObjectDetectionAPIModel
+import com.prakashspicesfsm.features.NewQuotation.dialog.MemberSalesmanListDialog
 import com.prakashspicesfsm.features.addAttendence.api.WorkTypeListRepoProvider
 import com.prakashspicesfsm.features.addAttendence.api.addattendenceapi.AddAttendenceRepoProvider
 import com.prakashspicesfsm.features.addAttendence.api.leavetytpeapi.LeaveTypeRepoProvider
@@ -60,8 +59,6 @@ import com.prakashspicesfsm.features.addAttendence.api.routeapi.RouteRepoProvide
 import com.prakashspicesfsm.features.addAttendence.model.*
 import com.prakashspicesfsm.features.addshop.api.typeList.TypeListRepoProvider
 import com.prakashspicesfsm.features.addshop.model.BeatListResponseModel
-import com.prakashspicesfsm.features.commondialogsinglebtn.CommonDialogSingleBtn
-import com.prakashspicesfsm.features.commondialogsinglebtn.OnDialogClickListener
 import com.prakashspicesfsm.features.dashboard.presentation.DashboardActivity
 import com.prakashspicesfsm.features.geofence.GeofenceService
 import com.prakashspicesfsm.features.location.LocationFuzedService
@@ -69,10 +66,12 @@ import com.prakashspicesfsm.features.location.LocationWizard
 import com.prakashspicesfsm.features.location.SingleShotLocationProvider
 import com.prakashspicesfsm.features.login.UserLoginDataEntity
 import com.prakashspicesfsm.features.login.model.LoginStateListDataModel
+import com.prakashspicesfsm.features.member.api.TeamRepoProvider
+import com.prakashspicesfsm.features.member.model.TeamListDataModel
+import com.prakashspicesfsm.features.member.model.TeamListResponseModel
 import com.prakashspicesfsm.features.newcollectionreport.PendingCollData
 import com.prakashspicesfsm.features.photoReg.api.GetUserListPhotoRegProvider
 import com.prakashspicesfsm.features.photoReg.model.UserFacePicUrlResponse
-import com.prakashspicesfsm.features.survey.SurveyFromListDialog
 import com.prakashspicesfsm.widgets.AppCustomEditText
 import com.prakashspicesfsm.widgets.AppCustomTextView
 import com.elvishew.xlog.XLog
@@ -83,7 +82,6 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.tasks.OnFailureListener
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.mlkit.vision.common.InputImage
@@ -91,12 +89,10 @@ import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetector
 import com.google.mlkit.vision.face.FaceDetectorOptions
-import com.itextpdf.text.pdf.PdfName.VIEW
 import com.themechangeapp.pickimage.PermissionHelper
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.doAsyncResult
 import org.jetbrains.anko.uiThread
 import org.json.JSONArray
 import org.json.JSONObject
@@ -166,6 +162,18 @@ class AddAttendanceFragment : Fragment(), View.OnClickListener, DatePickerDialog
     private lateinit var tv_beat_type: AppCustomTextView
     private lateinit var tv_dd: AppCustomTextView
     private lateinit var cv_dd: CardView
+
+    private lateinit var card_root_joint_visit_check: CardView
+    private lateinit var card_root_joint_team_sel: CardView
+    private lateinit var cb_frag_attend_joint_visit: CheckBox
+
+    private lateinit var tv_frag_attend_team_member: AppCustomTextView
+
+    private var member_list: ArrayList<TeamListDataModel>? = null
+
+    private var str_selUserName : String = ""
+    private var str_selUserID : String = ""
+    private var isJointVisitSel : Boolean = false
 
     private var isOnLeave = false
     private var workTypeId = ""
@@ -292,6 +300,25 @@ class AddAttendanceFragment : Fragment(), View.OnClickListener, DatePickerDialog
         tv_beat_type= view.findViewById(R.id.tv_beat_type)
         tv_dd = view.findViewById(R.id.tv_dd)
         cv_dd = view.findViewById(R.id.cv_dd_root)
+
+        tv_frag_attend_team_member = view.findViewById(R.id.tv_frag_attend_team_member)
+        card_root_joint_visit_check = view.findViewById(R.id.card_root_joint_visit_check)
+        card_root_joint_team_sel = view.findViewById(R.id.card_root_joint_team_sel)
+        cb_frag_attend_joint_visit = view.findViewById(R.id.cb_frag_attend_joint_visit)
+        card_root_joint_team_sel.setOnClickListener(this)
+        tv_frag_attend_team_member.setOnClickListener(this)
+        card_root_joint_team_sel.visibility = View.GONE
+        card_root_joint_visit_check.visibility = View.GONE
+
+        cb_frag_attend_joint_visit.setOnCheckedChangeListener{ buttonView, isChecked ->
+                if (isChecked){
+                    isJointVisitSel = true
+                    card_root_joint_team_sel.visibility = View.VISIBLE
+                }else{
+                    isJointVisitSel = false
+                    card_root_joint_team_sel.visibility = View.GONE
+                }
+            }
 
 
         tv_beat_type.hint = "Select " + "${Pref.beatText}" + " Type"
@@ -978,6 +1005,12 @@ class AddAttendanceFragment : Fragment(), View.OnClickListener, DatePickerDialog
                             else {
                                 workTypeId = workTypeList[i].ID.toString()
                                 tv_work_type.text = workTypeList[i].Descrpton
+
+                                if(Pref.IsJointVisitEnable){
+                                    card_root_joint_visit_check.visibility=View.VISIBLE
+                                }else{
+                                    card_root_joint_visit_check.visibility=View.GONE
+                                }
                             }
                         }
                     } else {
@@ -1480,6 +1513,7 @@ class AddAttendanceFragment : Fragment(), View.OnClickListener, DatePickerDialog
 
     }*/
 
+    @SuppressLint("SuspiciousIndentation", "NewApi")
     override fun onClick(view: View?) {
         when (view?.id) {
             R.id.tv_attendance_submit -> {
@@ -1611,18 +1645,26 @@ class AddAttendanceFragment : Fragment(), View.OnClickListener, DatePickerDialog
                         else
                             (mContext as DashboardActivity).showSnackMessage(getString(R.string.no_data_available))
                     }
+
                 }
+
+
             }
 
             R.id.cv_dd_root->{
-                /*val list = AppDatabase.getDBInstance()?.addShopEntryDao()?.getShopNameByDD("4") as ArrayList<AddShopDBModelEntity>
+                if(Pref.IsALLDDRequiredforAttendance){
+                    //based on assigned to dd
+                    val list = AppDatabase.getDBInstance()?.ddListDao()?.getAll() as ArrayList<AssignToDDEntity>
+                    if (list != null && list.isNotEmpty())
+                        showAssignDDListDialog(list)
+                }else{
+                    val list = AppDatabase.getDBInstance()?.addShopEntryDao()?.getShopNameByDD("4") as ArrayList<AddShopDBModelEntity>
                 if (list != null && list.isNotEmpty())
-                    showDDListDialog(list)*/
+                    showDDListDialog(list)
+                }
 
-                //based on assigned to dd
-                val list = AppDatabase.getDBInstance()?.ddListDao()?.getAll() as ArrayList<AssignToDDEntity>
-                if (list != null && list.isNotEmpty())
-                    showAssignDDListDialog(list)
+
+
             }
 
             R.id.rl_work_type_header -> {
@@ -1681,7 +1723,57 @@ class AddAttendanceFragment : Fragment(), View.OnClickListener, DatePickerDialog
                 else
                     (mContext as DashboardActivity).showSnackMessage(getString(R.string.no_date_found))
             }
+
+            R.id.card_root_joint_team_sel,R.id.tv_frag_attend_team_member ->{
+                getTeamList()
+            }
+
         }
+    }
+
+    private fun getTeamList() {
+        if (!AppUtils.isOnline(mContext)) {
+            (mContext as DashboardActivity).showSnackMessage(getString(R.string.no_internet))
+            return
+        }
+        progress_wheel.spin()
+
+        val repository = TeamRepoProvider.teamRepoProvider()
+        BaseActivity.compositeDisposable.add(
+            repository.teamList(Pref.user_id!!, if(Pref.IsShowAllEmployeeforJointVisit) true else false, if(Pref.IsShowAllEmployeeforJointVisit) true else false)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({ result ->
+                    val response = result as TeamListResponseModel
+                    XLog.d("GET TEAM DATA : " + "RESPONSE : " + response.status + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + response.message)
+                    if (response.status == NetworkConstant.SUCCESS) {
+                        progress_wheel.stopSpinning()
+                        if (response.member_list != null && response.member_list!!.size > 0) {
+                            member_list = response.member_list!!
+                            loadSaleman()
+                        } else {
+                            (mContext as DashboardActivity).showSnackMessage(response.message!!)
+                        }
+                    } else {
+                        progress_wheel.stopSpinning()
+                        (mContext as DashboardActivity).showSnackMessage(response.message!!)
+                    }
+                }, { error ->
+                    XLog.d("GET TEAM DATA : " + "ERROR : " + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + error.localizedMessage)
+                    error.printStackTrace()
+                    progress_wheel.stopSpinning()
+                    (mContext as DashboardActivity).showSnackMessage(getString(R.string.something_went_wrong))
+                })
+        )
+    }
+
+    private fun loadSaleman() {
+        MemberSalesmanListDialog.newInstance("Select Member",member_list!!){
+            tv_frag_attend_team_member.text=it.user_name
+            str_selUserName=it.user_name
+            str_selUserID=it.user_id
+        }.show((mContext as DashboardActivity).supportFragmentManager, "")
+
     }
 
 
@@ -1856,6 +1948,8 @@ class AddAttendanceFragment : Fragment(), View.OnClickListener, DatePickerDialog
         if (!isOnLeave) {
             if (TextUtils.isEmpty(workTypeId))
                 (mContext as DashboardActivity).showSnackMessage("Please select work type")
+             if (Pref.IsJointVisitEnable && TextUtils.isEmpty(tv_frag_attend_team_member.text.toString().trim()))
+                (mContext as DashboardActivity).showSnackMessage("Please select team member")
             else if(TextUtils.isEmpty(mbeatId) && Pref.IsBeatRouteAvailableinAttendance && false)
                 if(Pref.IsDistributorSelectionRequiredinAttendance ){
                     if(TextUtils.isEmpty(assignedToDDId)){
@@ -2250,6 +2344,7 @@ class AddAttendanceFragment : Fragment(), View.OnClickListener, DatePickerDialog
 
         addAttendenceModel.beat_id="0"
 
+
         val repository = AddAttendenceRepoProvider.addAttendenceRepo()
         progress_wheel.spin()
         BaseActivity.compositeDisposable.add(
@@ -2632,6 +2727,12 @@ class AddAttendanceFragment : Fragment(), View.OnClickListener, DatePickerDialog
 
 
             addAttendenceModel.beat_id =  if(Pref.IsBeatRouteAvailableinAttendance) Pref.SelectedBeatIDFromAttend else "0"
+
+
+//            addAttendenceModel.IsJointVisit = if(isJointVisitSel==true) "1" else "0"
+            addAttendenceModel.IsJointVisit = if(isJointVisitSel==true) isJointVisitSel.toString() else "false"
+            addAttendenceModel.JointVisitTeam_MemberName = str_selUserName
+            addAttendenceModel.JointVisitTeam_Member_User_ID =if(!str_selUserID.equals("")) str_selUserID else "0"
 
             doAttendanceViaApiOrPlanScreen()
 

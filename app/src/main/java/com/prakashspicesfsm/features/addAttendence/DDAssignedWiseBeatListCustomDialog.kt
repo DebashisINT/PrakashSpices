@@ -1,4 +1,4 @@
-package com.demo.features.addAttendence
+package com.prakashspicesfsm.features.addAttendence
 
 import android.content.Context
 import android.graphics.Color
@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.prakashspicesfsm.R
 import com.prakashspicesfsm.app.domain.AssignToDDEntity
 import com.prakashspicesfsm.widgets.AppCustomTextView
-
 
 class DDAssignedWiseBeatListCustomDialog : DialogFragment() {
 

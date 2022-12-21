@@ -13,6 +13,7 @@ import android.app.job.JobScheduler
 import android.content.*
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
@@ -64,9 +65,10 @@ import com.prakashspicesfsm.app.utils.AppUtils.Companion.isProfile
 import com.prakashspicesfsm.base.BaseResponse
 import com.prakashspicesfsm.base.presentation.BaseActivity
 import com.prakashspicesfsm.base.presentation.BaseFragment
-import com.prakashspicesfsm.features.NewQuotation.AddQuotFormFragment
-import com.prakashspicesfsm.features.NewQuotation.ViewAllQuotListFragment
-import com.prakashspicesfsm.features.NewQuotation.ViewDetailsQuotFragment
+import com.prakashspicesfsm.features.NewQuotation.*
+import com.prakashspicesfsm.features.NewQuotation.api.GetQuotRegProvider
+import com.prakashspicesfsm.features.NewQuotation.model.ViewDetailsQuotResponse
+import com.prakashspicesfsm.features.NewQuotation.model.shop_wise_quotation_list
 import com.prakashspicesfsm.features.SearchLocation.SearchLocationFragment
 import com.prakashspicesfsm.features.SearchLocation.locationInfoModel
 import com.prakashspicesfsm.features.TA.ViewAllTAListFragment
@@ -200,6 +202,7 @@ import com.prakashspicesfsm.features.orderhistory.activitiesapi.LocationFetchRep
 import com.prakashspicesfsm.features.orderhistory.model.FetchLocationRequest
 import com.prakashspicesfsm.features.orderhistory.model.FetchLocationResponse
 import com.prakashspicesfsm.features.orderhistory.model.LocationData
+import com.prakashspicesfsm.features.pendinglocationinout.PendingOutLocationFrag
 import com.prakashspicesfsm.features.performance.GpsStatusFragment
 import com.prakashspicesfsm.features.performance.PerformanceFragment
 import com.prakashspicesfsm.features.performance.api.UpdateGpsStatusRepoProvider
@@ -263,6 +266,11 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.common.util.concurrent.ListenableFuture
 import com.google.firebase.messaging.FirebaseMessaging
+import com.itextpdf.text.*
+import com.itextpdf.text.pdf.PdfPCell
+import com.itextpdf.text.pdf.PdfPTable
+import com.itextpdf.text.pdf.PdfWriter
+import com.itextpdf.text.pdf.draw.VerticalPositionMark
 import com.theartofdev.edmodo.cropper.CropImage
 import com.theartofdev.edmodo.cropper.CropImageView
 import com.themechangeapp.pickimage.PermissionHelper
@@ -336,7 +344,8 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
             XLog.d("token : " + token.toString())
         })
 
-        println("load_frag " + mFragType.toString() + "     " + Pref.user_id.toString());
+
+        println("load_frag " + mFragType.toString() + "     " + Pref.gpsAccuracy.toString());
         //AppDatabase.getDBInstance()!!.userLocationDataDao().updateUnknownLocationTest(AppUtils.getCurrentDateForShopActi(),"Unknown",false)
         if (addToStack) {
             mTransaction.add(R.id.frame_layout_container, getFragInstance(mFragType, initializeObject, true)!!, mFragType.toString())
@@ -466,6 +475,7 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
     lateinit var tv_noti_count: AppCustomTextView
     private lateinit var iv_home_icon: ImageView
     private lateinit var nearbyShops: AppCustomTextView
+    private lateinit var tv_pending_out_loc_menu: AppCustomTextView
     private lateinit var assignedLead: AppCustomTextView
     private lateinit var surveyMenu: AppCustomTextView
     private lateinit var shareLogs: AppCustomTextView
@@ -2003,6 +2013,7 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
         nearby_shops_TV = findViewById<AppCustomTextView>(R.id.nearby_shops_TV)
         my_orders_TV = findViewById<AppCustomTextView>(R.id.my_orders_TV)
         nearbyShops = findViewById<AppCustomTextView>(R.id.nearby_shop_TV)
+        tv_pending_out_loc_menu = findViewById<AppCustomTextView>(R.id.tv_pending_out_loc_menu)
         assignedLead = findViewById<AppCustomTextView>(R.id.assigned_lead_TV)
         surveyMenu = findViewById<AppCustomTextView>(R.id.assigned_survey_TV)
 
@@ -2061,6 +2072,8 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
 
         tv_clear_attendance = findViewById(R.id.tv_clear_attendance)
 
+        surveyMenu.text = Pref.surveytext
+
         home_RL.setOnClickListener(this)
         add_shop_RL.setOnClickListener(this)
         nearby_shops_RL.setOnClickListener(this)
@@ -2075,6 +2088,7 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
         tickTV.setOnClickListener(this)
         logo.setOnClickListener(this)
         nearbyShops.setOnClickListener(this)
+        tv_pending_out_loc_menu.setOnClickListener(this)
         assignedLead.setOnClickListener(this)
         surveyMenu.setOnClickListener(this)
         shareLogs.setOnClickListener(this)
@@ -2475,6 +2489,13 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
         else
             nearby_shop_TV.visibility = View.GONE
 
+        if (Pref.IsmanualInOutTimeRequired)
+            tv_pending_out_loc_menu.visibility = View.VISIBLE
+        else
+            tv_pending_out_loc_menu.visibility = View.GONE
+
+
+
         var launchIntent: Intent? = packageManager.getLaunchIntentForPackage("com.anydesk.anydeskandroid")
         if(launchIntent!=null){
             anydesk_info_TV.text="Open Anydesk"
@@ -2606,6 +2627,7 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
         }else{
             assignedLead.visibility=View.GONE
         }
+
         if(Pref.IsMenuSurveyEnabled){
             surveyMenu.visibility=View.VISIBLE
         }else{
@@ -2824,9 +2846,6 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
                                         val attendanceList = result as AttendanceResponse
                                         if (attendanceList.status == "205") {
                                             progress_wheel.stopSpinning()
-
-
-
                                             loadFragment(FragType.AddAttendanceFragment, true, "")
                                         } else if (attendanceList.status == NetworkConstant.SUCCESS) {
                                             progress_wheel.stopSpinning()
@@ -3094,6 +3113,15 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
                     }
                 } else {
                     loadFragment(FragType.LocalShopListFragment, false, "")
+                }
+            }
+            R.id.tv_pending_out_loc_menu -> {
+                if (!Pref.isAddAttendence) {
+                    (mContext as DashboardActivity).checkToShowAddAttendanceAlert()
+                    return
+                }
+                else {
+                    loadFragment(FragType.PendingOutLocationFrag, false, "")
                 }
             }
             R.id.assigned_lead_TV -> {
@@ -4218,7 +4246,8 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
                 if (enableFragGeneration) {
                     mFragment = SurveyFrag.getInstance(initializeObject)
                 }
-                setTopBarTitle("Survey")
+//                setTopBarTitle("Survey")
+                setTopBarTitle(Pref.surveytext)
                 setTopBarVisibility(TopBarConfig.HOME)
             }
             FragType.TeamBeatListFragment -> {
@@ -4234,6 +4263,13 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
                 }
                 setTopBarTitle("Attach Image")
                 setTopBarVisibility(TopBarConfig.BACK)
+            }
+            FragType.PendingOutLocationFrag -> {
+                if (enableFragGeneration) {
+                    mFragment = PendingOutLocationFrag()
+                }
+                setTopBarTitle("Pending Out Location")
+                setTopBarVisibility(TopBarConfig.HOME)
             }
             FragType.SurveyViewFrag -> {
                 if (enableFragGeneration) {
@@ -4392,8 +4428,10 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
                 if (enableFragGeneration) {
                     mFragment = OrderTypeListFragment.newInstance(initializeObject)
                 }
-                setTopBarTitle(getString(R.string.search_product))
-                setTopBarVisibility(TopBarConfig.CART)
+                Handler().postDelayed(Runnable {
+                    setTopBarTitle(getString(R.string.search_product)+"    ")
+                    setTopBarVisibility(TopBarConfig.CART)
+                }, 2500)
             }
             FragType.ReturnTypeListFragment -> {
                 if (enableFragGeneration) {
@@ -4406,15 +4444,17 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
                 if (enableFragGeneration) {
                     mFragment = CartFragment.newInstance(initializeObject)
                 }
-                if (AppUtils.stockStatus == 0) {
-                    setTopBarTitle(getString(R.string.cart_details))
-                    tv_confirm_btn.text = "Place Order"
-                } else if (AppUtils.stockStatus == 1) {
-                    setTopBarTitle(getString(R.string.opening_stock))
-                    tv_confirm_btn.text = "Place Stock"
-                }
+                Handler().postDelayed(Runnable {
+                    if (AppUtils.stockStatus == 0) {
+                        setTopBarTitle(getString(R.string.cart_details))
+                        tv_confirm_btn.text = "Place Order"
+                    } else if (AppUtils.stockStatus == 1) {
+                        setTopBarTitle(getString(R.string.opening_stock))
+                        tv_confirm_btn.text = "Place Stock"
+                    }
+                    setTopBarVisibility(TopBarConfig.CARTDETAILS)
+                }, 2500)
 
-                setTopBarVisibility(TopBarConfig.CARTDETAILS)
             }
             FragType.CartReturnFragment -> {
                 if (enableFragGeneration) {
@@ -7098,6 +7138,9 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
                 schemaqtyList.clear()
                 schemarateList.clear()
                 mrpList.clear()
+
+
+
             }
         }
         else if (getFragment() != null && getFragment() is ReturnTypeListFragment) {
@@ -7905,6 +7948,7 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
     }
 
 
+    @SuppressLint("SuspiciousIndentation")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
@@ -9229,7 +9273,7 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
                                     }else if(intent.getStringExtra("TYPE").equals("quotation_approval", ignoreCase = true)) {
                                         Handler().postDelayed(Runnable {
                                             if (getFragment() != null && getFragment() !is ViewAllQuotListFragment)
-                                            loadFragment(FragType.MemberListFragment, false, Pref.user_id!!)
+                                                loadFragment(FragType.MemberListFragment, false, Pref.user_id!!)
                                         }, 700)
                                     }else if(intent.getStringExtra("TYPE").equals("ZERO_COLL_STATUS", ignoreCase = true)) {
                                         Handler().postDelayed(Runnable {
@@ -10748,6 +10792,7 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
         var popupBody = ""
 
         shopName = storeName
+        mStoreName = storeName
         contactNumber = AppDatabase.getDBInstance()!!.addShopEntryDao().getContactNumber(shopId)
 
         popupBody = if (Pref.isRevisitCaptureImage) {
@@ -10787,7 +10832,13 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
                 if (Pref.isShowShopVisitReason)
                     return
 
-                startOwnShopRevisit(addShopDBModelEntity, storeName, shopId)
+                if(Pref.IsmanualInOutTimeRequired){
+                    mShopId = shopId
+                    mStoreName = storeName
+                    revisitShop("")
+                }else{
+                    startOwnShopRevisit(addShopDBModelEntity, storeName, shopId)
+                }
 
                 /*if (PermissionHelper.checkCameraPermission(mContext as DashboardActivity)) {
                     val photo = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
@@ -11727,7 +11778,7 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
 //        return super.onCreateOptionsMenu(menu)
         menuInflater.inflate(R.menu.menu, menu);
         return true;
@@ -12062,8 +12113,454 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
     private val fcmReceiver_quotation_approval = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             logo.startAnimation(AnimationUtils.loadAnimation(mContext, R.anim.shake))
+            //getQutoDtlsBeforePDF(CustomStatic.QutoNoFromNoti)
         }
     }
+
+    private fun getQutoDtlsBeforePDF(quto_no: String){
+        try{
+            val repository = GetQuotRegProvider.provideSaveButton()
+            BaseActivity.compositeDisposable.add(
+                repository.viewDetailsQuot(quto_no!!)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe({ result ->
+                        val addQuotResult = result as ViewDetailsQuotResponse
+                        var addQuotEditResult: ViewDetailsQuotResponse
+                        addQuotEditResult = addQuotResult
+                        if (addQuotResult!!.status == NetworkConstant.SUCCESS) {
+                            saveDataAsPdf(addQuotEditResult)
+                        } else {
+                            //(mContext as DashboardActivity).showSnackMessage(getString(R.string.something_went_wrong))
+                        }
+                        BaseActivity.isApiInitiated = false
+                    }, { error ->
+                        //(mContext as DashboardActivity).showSnackMessage(getString(R.string.something_went_wrong))
+                        BaseActivity.isApiInitiated = false
+                        if (error != null) {
+                        }
+                    })
+            )
+        }catch (ex: Exception){
+            ex.printStackTrace()
+            //(mContext as DashboardActivity).showSnackMessage(getString(R.string.something_went_wrong))
+        }
+    }
+    @SuppressLint("UseRequireInsteadOfGet")
+    private fun saveDataAsPdf(addQuotEditResult: ViewDetailsQuotResponse) {
+        var document: Document = Document()
+        val time = System.currentTimeMillis()
+        var fileName = addQuotEditResult.quotation_number!!.toUpperCase() +  "_" + time
+        fileName=fileName.replace("/", "_")
+        val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString()+"/eurobondApp/QUTO/"
+
+        val dir = File(path)
+        if (!dir.exists()) {
+            dir.mkdirs()
+        }
+        try{
+            progress_wheel.spin()
+            var pdfWriter : PdfWriter = PdfWriter.getInstance(document, FileOutputStream(path + fileName + ".pdf"))
+            val event = HeaderFooterPageEvent()
+            pdfWriter.setPageEvent(event)
+
+            document.open()
+
+            var font: Font = Font(Font.FontFamily.HELVETICA, 10f, Font.BOLD)
+            var fontB1: Font = Font(Font.FontFamily.HELVETICA, 9f, Font.BOLD)
+            var font1: Font = Font(Font.FontFamily.HELVETICA, 8f, Font.NORMAL)
+            var font1Big: Font = Font(Font.FontFamily.HELVETICA, 10f, Font.NORMAL)
+            var font2Big: Font = Font(Font.FontFamily.HELVETICA, 9f, Font.NORMAL)
+            var font1small: Font = Font(Font.FontFamily.HELVETICA, 8f, Font.NORMAL)
+            val grayFront = Font(Font.FontFamily.HELVETICA, 10f, Font.NORMAL, BaseColor.BLACK)
+            //image add
+            val bm: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.breezelogo)
+            val bitmap = Bitmap.createScaledBitmap(bm, 220, 90, true);
+            val stream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+            var img: Image? = null
+            val byteArray: ByteArray = stream.toByteArray()
+            try {
+                img = Image.getInstance(byteArray)
+                img.scaleToFit(155f,90f)
+                img.scalePercent(70f)
+                img.alignment= Image.ALIGN_RIGHT
+            } catch (e: BadElementException) {
+                e.printStackTrace()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+            document.add(img)
+
+            val para = Paragraph()
+            val glue = Chunk(VerticalPositionMark())
+            val ph1 = Phrase()
+            val main = Paragraph()
+            ph1.add(Chunk("DATE: " + addQuotEditResult.quotation_date_selection!!, font))
+            ph1.add(glue) // Here I add special chunk to the same phrase.
+
+            ph1.add(Chunk(addQuotEditResult.quotation_number + "                         ", font))
+            para.add(ph1)
+            document.add(para)
+
+            val xxx = Paragraph("", font)
+            xxx.spacingAfter = 5f
+            document.add(xxx)
+
+            val toLine = Paragraph("To,", font)
+            toLine.alignment = Element.ALIGN_LEFT
+            toLine.spacingAfter = 2f
+            document.add(toLine)
+
+            val cusName = Paragraph(addQuotEditResult.shop_name, font)
+            cusName.alignment = Element.ALIGN_LEFT
+            cusName.spacingAfter = 2f
+            document.add(cusName)
+
+            //// addr test begin
+            var finalStr =""
+            try{
+                var str = addQuotEditResult.shop_addr.toString().toCharArray()
+                finalStr =""
+                var isNw=false
+                var comCnt=0
+                for(i in 0..str.size-1){
+                    if(str[i].toString().equals(",")){
+                        comCnt++
+                        finalStr=finalStr+","
+                        if(comCnt%2==0){
+                            finalStr=finalStr+"\n"
+                            isNw=true
+                        }
+                    }else {
+                        if(isNw && str[i].toString().equals(" ")){
+                            isNw=false
+                        }else{
+                            finalStr=finalStr+str[i].toString()
+                        }
+                    }
+                }
+            }catch (ex:Exception){
+                finalStr=""
+            }
+
+            val cusAddress = Paragraph(finalStr, font)
+            cusAddress.alignment = Element.ALIGN_LEFT
+            cusAddress.spacingAfter = 5f
+            document.add(cusAddress)
+
+            val shopPincode = Paragraph("Pincode : "+addQuotEditResult.shop_address_pincode, font)
+            shopPincode.alignment = Element.ALIGN_LEFT
+            shopPincode.spacingAfter = 5f
+            document.add(shopPincode)
+
+            val projectName = Paragraph("Project Name : "+addQuotEditResult.project_name, font)
+            projectName.alignment = Element.ALIGN_LEFT
+            projectName.spacingAfter = 5f
+            document.add(projectName)
+
+            val cusemail = Chunk("Email : " +  addQuotEditResult.shop_email, font)
+            document.add(cusemail)
+
+            val xx = Paragraph("", font)
+            xx.spacingAfter = 6f
+            document.add(xx)
+
+            val cusowner = Chunk("Kind Attn. " +  "Mr./Mrs. "+addQuotEditResult.shop_owner_name + "  " + "(Mob.No.  " + addQuotEditResult.shop_phone_no + ")", font)
+            cusowner.setUnderline(0.1f, -2f) //0.1 thick, -2 y-location
+            document.add(cusowner)
+
+            val x = Paragraph("", font)
+
+            x.spacingAfter = 6f
+            document.add(x)
+
+            // Hardcoded for EuroBond
+//            val sub = Paragraph("Sub :-Quotation For Eurobond-ALUMINIUM COMPOSITE PANEL", font)
+//            val sub = Chunk("Sub :-Quotation For Eurobond-ALUMINIUM COMPOSITE PANEL", font)
+            val sub = Chunk("Sub :-Quotation For "+getString(R.string.app_name), font)
+            sub.setUnderline(0.1f, -2f) //0.1 thick, -2 y-location
+            //sub.alignment = Element.ALIGN_LEFT
+            //sub.spacingAfter = 10f
+            document.add(sub)
+
+            val body = Paragraph("\nSir,\n" +
+                    "In reference to the discusssion held with you regarding the said subject,we are please to quote our most " +
+                    "preferred rates & others terms and condition for the same as follows.\n", grayFront)
+            body.alignment = Element.ALIGN_LEFT
+            body.spacingAfter = 10f
+            document.add(body)
+
+            val widths = floatArrayOf(0.07f, 0.44f,0.13f, 0.18f, 0.18f)
+
+            var tableHeader: PdfPTable = PdfPTable(widths)
+            tableHeader.getDefaultCell().setHorizontalAlignment(Element.ALIGN_CENTER)
+            tableHeader.setWidthPercentage(100f)
+
+            val cell1 = PdfPCell(Phrase("Sr.No",font1Big))
+            cell1.setHorizontalAlignment(Element.ALIGN_CENTER);
+            tableHeader.addCell(cell1);
+
+            val cell2 = PdfPCell(Phrase("Description",font1Big))
+            cell2.setHorizontalAlignment(Element.ALIGN_CENTER);
+            tableHeader.addCell(cell2);
+
+            val cell2_1 = PdfPCell(Phrase("Color Code/Series",font1Big))
+            cell2_1.setHorizontalAlignment(Element.ALIGN_CENTER);
+            tableHeader.addCell(cell2_1);
+
+            val cell3 = PdfPCell(Phrase("Rate/Sq.Mtr (INR)",font1Big))
+            cell3.setHorizontalAlignment(Element.ALIGN_CENTER);
+            tableHeader.addCell(cell3);
+
+            val cell4 = PdfPCell(Phrase("Rate/Sq.Ft (INR)",font1Big))
+            cell4.setHorizontalAlignment(Element.ALIGN_CENTER);
+            tableHeader.addCell(cell4);
+
+            document.add(tableHeader)
+
+            //table body
+            var srNo:String=""
+            var desc:String=""
+            var catagory:String=""
+            var colorCode:String=""
+            var rateSqFt:String=""
+            var rateSqMtr:String=""
+            var obj=addQuotEditResult.quotation_product_details_list
+            for (i in 0..obj!!.size-1) {
+                srNo= (i+1).toString()
+                desc=obj!!.get(i).product_name.toString() //+ "\n\n"+ "Color Code : "+obj.get(i).color_name
+                colorCode = obj.get(i).color_name.toString()
+                rateSqFt="INR - "+obj!!.get(i).rate_sqft.toString()
+                rateSqMtr="INR - "+obj!!.get(i).rate_sqmtr.toString()
+                try{
+                    catagory = AppDatabase.getDBInstance()?.productListDao()?.getSingleProduct(obj!!.get(i).product_id!!.toInt()!!)!!.category.toString()
+                }catch (ex:Exception){
+                    catagory=""
+                }
+                desc=desc+"\n"+catagory
+
+                val tableRows = PdfPTable(widths)
+                tableRows.defaultCell.horizontalAlignment = Element.ALIGN_CENTER
+                tableRows.setWidthPercentage(100f);
+
+                var cellBodySl = PdfPCell(Phrase(srNo,font1small))
+                cellBodySl.setHorizontalAlignment(Element.ALIGN_CENTER);
+                tableRows.addCell(cellBodySl)
+
+                var cellBodyDesc = PdfPCell(Phrase(desc,font1small))
+                cellBodyDesc.setHorizontalAlignment(Element.ALIGN_CENTER);
+                tableRows.addCell(cellBodyDesc)
+
+                var cellBodyColor = PdfPCell(Phrase(colorCode,font1small))
+                cellBodyColor.setHorizontalAlignment(Element.ALIGN_CENTER);
+                tableRows.addCell(cellBodyColor)
+
+                var cellBodySqMtr = PdfPCell(Phrase(rateSqMtr,font1small))
+                cellBodySqMtr.setHorizontalAlignment(Element.ALIGN_CENTER);
+                tableRows.addCell(cellBodySqMtr)
+
+                var cellBodySqFt = PdfPCell(Phrase(rateSqFt,font1small))
+                cellBodySqFt.setHorizontalAlignment(Element.ALIGN_CENTER);
+                tableRows.addCell(cellBodySqFt)
+
+                document.add(tableRows)
+                document.add(Paragraph())
+            }
+
+            val terms = Chunk("\nTerms & Conditions:-", font)
+            terms.setUnderline(0.1f, -2f) //0.1 thick, -2 y-location
+            document.add(terms)
+
+            val taxs = Paragraph("Taxes                                                  :     " + addQuotEditResult.taxes, font2Big)
+            taxs.alignment = Element.ALIGN_LEFT
+            taxs.spacingAfter = 2f
+            document.add(taxs)
+
+            val freight = Paragraph("Freight                                                 :     " + addQuotEditResult.Freight, font2Big)
+            freight.alignment = Element.ALIGN_LEFT
+            freight.spacingAfter = 2f
+            document.add(freight)
+
+            val delivery = Paragraph("Delivery Time                                      :     " + addQuotEditResult.delivery_time, font2Big)
+            delivery.alignment = Element.ALIGN_LEFT
+            delivery.spacingAfter = 2f
+            document.add(delivery)
+
+            val payment = Paragraph("Payment                                              :     " + addQuotEditResult.payment, font2Big)
+            payment.alignment = Element.ALIGN_LEFT
+            payment.spacingAfter = 2f
+            document.add(payment)
+
+            val validity = Paragraph("Validity                                                 :     " + addQuotEditResult.validity, font2Big)
+            validity.alignment = Element.ALIGN_LEFT
+            validity.spacingAfter = 2f
+            document.add(validity)
+
+            val billing = Paragraph("Billing                                                   :     " + addQuotEditResult.billing, font2Big)
+            billing.alignment = Element.ALIGN_LEFT
+            billing.spacingAfter = 2f
+            document.add(billing)
+
+            val product_tolerance_of_thickness = Paragraph("Product Tolerance of Thickness          :     " + addQuotEditResult.product_tolerance_of_thickness, font2Big)
+            product_tolerance_of_thickness.alignment = Element.ALIGN_LEFT
+            product_tolerance_of_thickness.spacingAfter = 2f
+            document.add(product_tolerance_of_thickness)
+
+            val product_tolerance_of_coating = Paragraph("Tolerance of Coating Thickness          :     " + addQuotEditResult.tolerance_of_coating_thickness, font2Big)
+            product_tolerance_of_coating.alignment = Element.ALIGN_LEFT
+            product_tolerance_of_coating.spacingAfter = 6f
+            document.add(product_tolerance_of_coating)
+
+            val end = Paragraph("Anticipating healthy business relation with your esteemed organization.", grayFront)
+            end.alignment = Element.ALIGN_LEFT
+            end.spacingAfter = 4f
+            document.add(end)
+
+            val thanks = Paragraph("\nThanks & Regards,", fontB1)
+            thanks.alignment = Element.ALIGN_LEFT
+            thanks.spacingAfter = 4f
+            document.add(thanks)
+
+            // Hardcoded for EuroBond
+//            val companyName = Paragraph("EURO PANEL PRODUCTS LIMITED", fontB1)
+            val companyName = Paragraph(getString(R.string.app_name), fontB1)
+            companyName.alignment = Element.ALIGN_LEFT
+            companyName.spacingAfter = 2f
+            document.add(companyName)
+
+            val salesmanName = Paragraph(addQuotEditResult.salesman_name, fontB1)
+            salesmanName.alignment = Element.ALIGN_LEFT
+            salesmanName.spacingAfter = 2f
+            document.add(salesmanName)
+
+            val salesmanDes = Paragraph(addQuotEditResult.salesman_designation, fontB1)
+            salesmanDes.alignment = Element.ALIGN_LEFT
+            salesmanDes.spacingAfter = 2f
+            document.add(salesmanDes)
+
+            val salesmanphone = Paragraph("Mob : " +addQuotEditResult.salesman_login_id, fontB1)
+            salesmanphone.alignment = Element.ALIGN_LEFT
+            salesmanphone.spacingAfter =  2f
+            document.add(salesmanphone)
+
+            val salesmanemail = Paragraph("Email : "+addQuotEditResult.salesman_email, fontB1)
+            salesmanemail.alignment = Element.ALIGN_LEFT
+            salesmanemail.spacingAfter =  2f
+            document.add(salesmanemail)
+
+            val xxxx = Paragraph("", font)
+            xxxx.spacingAfter = 4f
+            document.add(xxxx)
+
+            // Hardcoded for EuroBond
+//            val euroHead = Paragraph("\nEURO PANEL PRODUCTS LIMITED", font)
+            val euroHead = Paragraph("\n"+getString(R.string.app_name), font)
+            euroHead.alignment = Element.ALIGN_LEFT
+            //document.add(euroHead)
+
+            //strip_line//bar//ics
+            //Hardcoded for EuroBond
+            val bm1: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.ics_image)
+//            val bm1: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.footer_icon_euro)
+//            val bm1: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.bar)
+            val bitmap1 = Bitmap.createScaledBitmap(bm1, 850, 120, true)
+            val stream1 = ByteArrayOutputStream()
+            bitmap1.compress(Bitmap.CompressFormat.PNG, 100, stream1)
+            var img1: Image? = null
+            val byteArray1: ByteArray = stream1.toByteArray()
+            try {
+                img1 = Image.getInstance(byteArray1)
+                img1.alignment= Image.ALIGN_LEFT
+            } catch (e: BadElementException) {
+                e.printStackTrace()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+//            document.add(img1)
+
+            val bm2: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.bar)
+            val bitmap2 = Bitmap.createScaledBitmap(bm2, 50, 50, true)
+            val stream2 = ByteArrayOutputStream()
+            bitmap2.compress(Bitmap.CompressFormat.PNG, 100, stream2)
+            var img2: Image? = null
+            val byteArray2: ByteArray = stream2.toByteArray()
+            try {
+                img2 = Image.getInstance(byteArray2)
+            } catch (e: BadElementException) {
+                e.printStackTrace()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+//            document.add(img2)
+
+            val companydel = Paragraph("Regd.Off: 702,Aravali Business Centre,Ramadas Sutrale Road,Borivali(West),Mumbai-400 092." +
+                    "Factory: Survey No.124/4,Manekpur,Sanjan,Khattalwada,Taluka- Umbergaon,Dist.Valsad,Gujarat - 396120" +
+                    "T: +91-22-29686500(30 lines) +91-7666625999 - E: sale@eurobondacp.com + W: www.eurobondacp.com + CIN: U28931MH2013PTC251176" +
+                    "", font1)
+            companydel.alignment = Element.ALIGN_RIGHT
+            companydel.spacingAfter = 10f
+
+            val tablee = PdfPTable(1)
+            tablee.widthPercentage = 100f
+            var cell = PdfPCell()
+            var p = Paragraph()
+            p.alignment= Element.ALIGN_LEFT
+            img1!!.scalePercent(50f)
+            p.add(Chunk(img1, 0f, 0f, true))
+            //p.add(Chunk(img2, 0f, 0f, true))
+            //p.add(companydel)
+            cell.addElement(p)
+            cell.backgroundColor= BaseColor(0, 0, 0, 0)
+            cell.borderColor= BaseColor(0, 0, 0, 0)
+
+            cell.setHorizontalAlignment(PdfPCell.ALIGN_LEFT)
+            tablee.addCell(cell)
+            //document.add(tablee)
+
+            val bm3: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.strip_line)
+            val bitmap3 = Bitmap.createScaledBitmap(bm3, 520, 20, true)
+            val stream3 = ByteArrayOutputStream()
+            bitmap3.compress(Bitmap.CompressFormat.PNG, 100, stream3)
+            var img3: Image? = null
+            val byteArray3: ByteArray = stream3.toByteArray()
+            try {
+                img3 = Image.getInstance(byteArray3)
+            } catch (e: BadElementException) {
+                e.printStackTrace()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+            //document.add(img3)
+            document.close()
+
+
+            var sendingPath=path+fileName+".pdf"
+
+            // Hardcoded for EuroBond
+            val m = Mail("eurobondacp02@gmail.com", "nuqfrpmdjyckkukl")
+            //val m = Mail("saheli.bhattacharjee@indusnet.co.in", "@Intsaheli22")
+            val toArr = arrayOf("saheli.bhattacharjee@indusnet.co.in","suman.bachar@indusnet.co.in","suman.roy@indusnet.co.in")
+//            val toArr = arrayOf("sales1@eurobondacp.com", "sales@eurobondacp.com")
+            m.setTo(toArr)
+            m.setFrom("TEAM");
+            m.setSubject("Quotation for ${ViewAllQuotListFragment.shop_name} created on dated ${addQuotEditResult.save_date_time!!.split(" ").get(0)}.")
+            m.setBody("Hello Team,  \n Please find attached Quotation No. ${addQuotEditResult.quotation_number} Dated ${addQuotEditResult.save_date_time!!.split(" ").get(0)} for ${ViewAllQuotListFragment.shop_name} \n\n\n Regards \n${Pref.user_name}.")
+            doAsync {
+                val fileUrl = Uri.parse(sendingPath)
+                val i = m.send(fileUrl.path)
+                uiThread {
+                }
+            }
+        }catch (ex: Exception){
+            progress_wheel.stopSpinning()
+            ex.printStackTrace()
+            Toaster.msgShort(mContext, ex.message.toString())
+            (mContext as DashboardActivity).showSnackMessage(getString(R.string.something_went_wrong))
+        }
+
+    }
+
 
     private val fcmClearDataReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -12580,10 +13077,6 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
     }
 
     fun rectifyUnknownLoc(){
-        dialogHeaderProcess.text = "Syncing Important Data. Please wait..."
-        val dialogYes = simpleDialogProcess.findViewById(R.id.tv_message_ok) as AppCustomTextView
-        simpleDialogProcess.show()
-
         try {
             doAsync {
 
@@ -12597,15 +13090,53 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
                     }
                 }
                 uiThread {
-                    callShopDurationApi()
+                    //callShopDurationApi()
+                    checkManualRevisitEnd()
                 }
             }
 
         }catch (ex:Exception){
             ex.printStackTrace()
-            callShopDurationApi()
+            //callShopDurationApi()
+            checkManualRevisitEnd()
         }
     }
+
+    fun checkManualRevisitEnd(){
+        if(Pref.IsmanualInOutTimeRequired){
+            var objL =  AppDatabase.getDBInstance()!!.shopActivityDao().getDurationCalculatedVisitedShopForADay(AppUtils.getCurrentDateForShopActi(), false)
+            if(objL.size>0){
+                val simpleDialog = Dialog(mContext)
+                simpleDialog.setCancelable(false)
+                simpleDialog.getWindow()!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                simpleDialog.setContentView(R.layout.dialog_ok)
+                val dialogHeader = simpleDialog.findViewById(R.id.dialog_yes_header_TV) as AppCustomTextView
+                dialogHeader.text = "Shop out location is pending."
+                val dialogYes = simpleDialog.findViewById(R.id.tv_dialog_yes) as AppCustomTextView
+                dialogYes.setOnClickListener({ view ->
+                    simpleDialog.cancel()
+                    loadFragment(FragType.PendingOutLocationFrag, false, "")
+                })
+                simpleDialog.show()
+            }
+            else{
+
+                dialogHeaderProcess.text = "Syncing Important Data. Please wait..."
+                val dialogYes = simpleDialogProcess.findViewById(R.id.tv_message_ok) as AppCustomTextView
+                simpleDialogProcess.show()
+
+                callShopDurationApi()
+            }
+        }else{
+            dialogHeaderProcess.text = "Syncing Important Data. Please wait..."
+            val dialogYes = simpleDialogProcess.findViewById(R.id.tv_message_ok) as AppCustomTextView
+            simpleDialogProcess.show()
+
+            callShopDurationApi()
+        }
+
+    }
+
 
     private fun callShopDurationApi() {
         //dialogHeaderProcess.text = "Syncing Important Data. Please wait..."

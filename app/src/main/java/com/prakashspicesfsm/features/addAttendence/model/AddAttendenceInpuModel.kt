@@ -33,4 +33,7 @@ class AddAttendenceInpuModel {
     var to_id = ""
     var distance = ""
     var beat_id = ""
+    var IsJointVisit = ""
+    var JointVisitTeam_MemberName = ""
+    var JointVisitTeam_Member_User_ID = ""
 }

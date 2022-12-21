@@ -1,4 +1,4 @@
-package com.demo.features.addAttendence
+package com.prakashspicesfsm.features.addAttendence
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.prakashspicesfsm.R
+import com.prakashspicesfsm.app.domain.AddShopDBModelEntity
 import com.prakashspicesfsm.app.domain.AssignToDDEntity
 import kotlinx.android.synthetic.main.row_dialog_new_order_gender.view.*
 

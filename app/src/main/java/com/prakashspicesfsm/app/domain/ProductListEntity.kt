@@ -39,4 +39,10 @@ class ProductListEntity {
 
     @ColumnInfo(name = "watt")
     var watt: String? = null
+
+    @ColumnInfo(name = "product_mrp_show")
+    var product_mrp_show: String? = null
+
+    @ColumnInfo(name = "product_discount_show")
+    var product_discount_show: String? = null
 }

@@ -1421,7 +1421,11 @@ class LogoutSyncFragment : BaseFragment(), View.OnClickListener {
                                 XLog.d("syncShopFromShopList : " + ", SHOP: " + addShop.shop_name + ", RESPONSE:" + result.message)
                                 if (addShopResult.status == NetworkConstant.SUCCESS) {
                                     AppDatabase.getDBInstance()!!.addShopEntryDao().updateIsUploaded(true, addShop.shop_id)
+                                    if(AppUtils.isOnline(mContext)){
+//                                        if(Pref.isMultipleVisitEnable)
+                                            AppDatabase.getDBInstance()!!.shopActivityDao().updateIsUploaded(true, addShop.shop_id!!,AppUtils.getCurrentDateForShopActi())
 
+                                    }
                                     doAsync {
                                         val resultAs = runLongTask(addShop.shop_id)
                                         uiThread {
@@ -1616,6 +1620,8 @@ class LogoutSyncFragment : BaseFragment(), View.OnClickListener {
 
     private fun callShopActivitySubmit(shopId: String) {
         var list = AppDatabase.getDBInstance()!!.shopActivityDao().getShopForDay(shopId, AppUtils.getCurrentDateForShopActi())
+//        var list = AppDatabase.getDBInstance()!!.shopActivityDao().getShopForDayisUploaded(shopId, AppUtils.getCurrentDateForShopActi(),false)
+
         if (list.isEmpty())
             return
         var shopDataList: MutableList<ShopDurationRequestData> = java.util.ArrayList()

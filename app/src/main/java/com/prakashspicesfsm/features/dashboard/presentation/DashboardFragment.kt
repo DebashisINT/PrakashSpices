@@ -234,7 +234,7 @@ class DashboardFragment : BaseFragment(), View.OnClickListener, HBRecorderListen
     private lateinit var ll_dash_day_end_newD   : LinearLayout
 
     lateinit var tv_beatNamenew: TextView
-
+    lateinit var ll_beat_shop_wise: LinearLayout
 
 
 
@@ -615,6 +615,7 @@ class DashboardFragment : BaseFragment(), View.OnClickListener, HBRecorderListen
 
     @SuppressLint("UseRequireInsteadOfGet", "RestrictedApi")
     private fun initView(view: View?) {
+        ll_beat_shop_wise = view!!.findViewById(R.id.ll_beat_shop_wise)
         tv_beatNamenew =  view!!.findViewById(R.id.tv_beatNamenew)
         cancel_timer = view!!.findViewById(R.id.cancel_timer)
         iv_screen_status = view!!.findViewById(R.id.iv_screen_status)
@@ -833,6 +834,7 @@ class DashboardFragment : BaseFragment(), View.OnClickListener, HBRecorderListen
         tv_pick_date_range.setOnClickListener(this)
         n_shops_TV.setOnClickListener(this)
         n_time_TV.setOnClickListener(this)
+        ll_beat_shop_wise.setOnClickListener(this)
 
         fab_bot.setCustomClickListener {
             (mContext as DashboardActivity).showLanguageAlert(false)
@@ -1142,6 +1144,24 @@ class DashboardFragment : BaseFragment(), View.OnClickListener, HBRecorderListen
                         }).show((mContext as DashboardActivity).supportFragmentManager, "")
                     }*/
 
+                    var objL =  AppDatabase.getDBInstance()!!.shopActivityDao().getDurationCalculatedVisitedShopForADay(AppUtils.getCurrentDateForShopActi(), false)
+                    if(Pref.IsmanualInOutTimeRequired && objL.size>0){
+                        val simpleDialog = Dialog(mContext)
+                        simpleDialog.setCancelable(false)
+                        simpleDialog.getWindow()!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                        simpleDialog.setContentView(R.layout.dialog_ok)
+                        val dialogHeader = simpleDialog.findViewById(R.id.dialog_yes_header_TV) as AppCustomTextView
+                        dialogHeader.text = "Shop out location is pending."
+                        val dialogYes = simpleDialog.findViewById(R.id.tv_dialog_yes) as AppCustomTextView
+                        dialogYes.setOnClickListener({ view ->
+                            simpleDialog.cancel()
+                            (context as DashboardActivity).loadFragment(FragType.PendingOutLocationFrag, false, "")
+                        })
+                        simpleDialog.show()
+
+                        return
+                    }
+
                     if(Pref.IsShowDayStart){
                         if (!Pref.DayStartMarked) {
                             val simpleDialog = Dialog(mContext)
@@ -1162,7 +1182,6 @@ class DashboardFragment : BaseFragment(), View.OnClickListener, HBRecorderListen
                             return
                         }
                     }
-
 
                     if (Pref.isMeetingAvailable && Pref.isShopAddEditAvailable) {
                         CustomStatic.IsCommDLeftBtnColor = true
@@ -1399,6 +1418,24 @@ class DashboardFragment : BaseFragment(), View.OnClickListener, HBRecorderListen
                     (mContext as DashboardActivity).loadFragment(FragType.BeatListFragment, false, "")
                 //(mContext as DashboardActivity).loadFragment(FragType.NewNearByShopsListFragment, false, "")
 
+            }
+            R.id.ll_beat_shop_wise -> {
+                if (!Pref.isShowShopBeatWise) {
+                    (mContext as DashboardActivity).isShopFromChatBot = false
+                    if (!Pref.isServiceFeatureEnable)
+                        if(Pref.SelectedBeatIDFromAttend.equals("-1")){
+                            (mContext as DashboardActivity).loadFragment(FragType.NearByShopsListFragment, false, "")
+                        }
+                        else if(Pref.SelectedBeatIDFromAttend.equals("0")){
+                            (mContext as DashboardActivity).loadFragment(FragType.NearByShopsListFragment, false, "")
+                        }
+                        else{
+                            (mContext as DashboardActivity).loadFragment(FragType.NearByShopsListFragment, true, Pref.SelectedBeatIDFromAttend!!)
+                        }
+                    else
+                        (mContext as DashboardActivity).loadFragment(FragType.CustomerListFragment, false, "")
+                } else
+                    (mContext as DashboardActivity).loadFragment(FragType.BeatListFragment, false, "")
             }
             R.id.attandance_ll -> {
                 (mContext as DashboardActivity).isChatBotAttendance = false
@@ -1783,13 +1820,15 @@ class DashboardFragment : BaseFragment(), View.OnClickListener, HBRecorderListen
 
             if(!Pref.SelectedBeatIDFromAttend.equals("-1") && Pref.IsBeatRouteAvailableinAttendance && Pref.isAddAttendence){
                 try{
-                    tv_beatNamenew.visibility = View.VISIBLE
-                    tv_beatNamenew.text = "Beat Name: " +AppDatabase.getDBInstance()?.beatDao()?.getSingleItem(Pref.SelectedBeatIDFromAttend)!!.name
+                    ll_beat_shop_wise .visibility = View.VISIBLE
+                    var beatName:String = "Beat Name: " +AppDatabase.getDBInstance()?.beatDao()?.getSingleItem(Pref.SelectedBeatIDFromAttend)!!.name
+                    var beatShopSize = AppDatabase.getDBInstance()!!.addShopEntryDao().getShopBeatWise(Pref.SelectedBeatIDFromAttend).size
+                    tv_beatNamenew.text = "Total Shop Count : " +beatShopSize+" "+"\n"+beatName
                 }catch (ex:Exception){
                     ex.printStackTrace()
                 }
-                
                 return
+
                 scope.launch {
                     pjpList = loadpjpWithThread(pjpList)
                 }.invokeOnCompletion {
@@ -3861,6 +3900,16 @@ class DashboardFragment : BaseFragment(), View.OnClickListener, HBRecorderListen
                                                     Pref.IsFeedbackAvailableInShop = response.getconfigure!![i].Value == "1"
                                                 }
                                             }
+                                                 else if (response.getconfigure!![i].Key.equals("IsFeedbackMandatoryforNewShop", ignoreCase = true)) {
+                                                if (!TextUtils.isEmpty(response.getconfigure?.get(i)?.Value)) {
+                                                    Pref.IsFeedbackMandatoryforNewShop = response.getconfigure!![i].Value == "1"
+                                                }
+                                            }
+                                            else if (response.getconfigure!![i].Key.equals("IsLoginSelfieRequired", ignoreCase = true)) {
+                                                if (!TextUtils.isEmpty(response.getconfigure?.get(i)?.Value)) {
+                                                    Pref.IsLoginSelfieRequired = response.getconfigure!![i].Value == "1"
+                                                }
+                                            }
                                             else if (response.getconfigure!![i].Key.equals("IsAllowBreakageTracking", ignoreCase = true)) {
                                                 if (!TextUtils.isEmpty(response.getconfigure?.get(i)?.Value)) {
                                                     Pref.IsAllowBreakageTracking = response.getconfigure!![i].Value == "1"
@@ -3912,6 +3961,16 @@ class DashboardFragment : BaseFragment(), View.OnClickListener, HBRecorderListen
                                                 }catch (e: Exception) {
                                                     e.printStackTrace()
                                                     Pref.GPSNetworkIntervalMins = "0"
+                                                }
+                                            }
+                                            else if (response.getconfigure!![i].Key.equals("IsJointVisitEnable", ignoreCase = true)) {
+                                                if (!TextUtils.isEmpty(response.getconfigure?.get(i)?.Value)) {
+                                                    Pref.IsJointVisitEnable = response.getconfigure!![i].Value == "1"
+                                                }
+                                            }
+                                            else if (response.getconfigure!![i].Key.equals("IsShowAllEmployeeforJointVisit", ignoreCase = true)) {
+                                                if (!TextUtils.isEmpty(response.getconfigure?.get(i)?.Value)) {
+                                                    Pref.IsShowAllEmployeeforJointVisit = response.getconfigure!![i].Value == "1"
                                                 }
                                             }
 
@@ -4190,6 +4249,34 @@ class DashboardFragment : BaseFragment(), View.OnClickListener, HBRecorderListen
 
                                 if (configResponse.IsMultipleImagesRequired != null)
                                     Pref.IsMultipleImagesRequired = configResponse.IsMultipleImagesRequired!!
+
+                                if (configResponse.IsALLDDRequiredforAttendance != null)
+                                    Pref.IsALLDDRequiredforAttendance = configResponse.IsALLDDRequiredforAttendance!!
+
+                                if (configResponse.IsShowNewOrderCart != null)
+                                    Pref.IsShowNewOrderCart = configResponse.IsShowNewOrderCart!!
+
+                                if (configResponse.IsmanualInOutTimeRequired != null)
+                                    Pref.IsmanualInOutTimeRequired = configResponse.IsmanualInOutTimeRequired!!
+
+                                if (!TextUtils.isEmpty(configResponse.surveytext))
+                                    Pref.surveytext = configResponse.surveytext
+
+                                if (configResponse.IsDiscountInOrder != null)
+                                    Pref.IsDiscountInOrder = configResponse.IsDiscountInOrder!!
+
+                                if (configResponse.IsViewMRPInOrder != null)
+                                    Pref.IsViewMRPInOrder = configResponse.IsViewMRPInOrder!!
+                                
+                                if (configResponse.IsShowStateInTeam != null)
+                                    Pref.IsShowStateInTeam = configResponse.IsShowStateInTeam!!
+
+                                if (configResponse.IsShowBranchInTeam != null)
+                                    Pref.IsShowBranchInTeam = configResponse.IsShowBranchInTeam!!
+
+                                if (configResponse.IsShowDesignationInTeam != null)
+                                    Pref.IsShowDesignationInTeam = configResponse.IsShowDesignationInTeam!!
+
 
                             }
                             BaseActivity.isApiInitiated = false

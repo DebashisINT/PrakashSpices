@@ -36,7 +36,9 @@ import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import com.prakashspicesfsm.R
+import com.prakashspicesfsm.app.AppDatabase
 import com.prakashspicesfsm.app.Pref
+import com.prakashspicesfsm.features.location.LocationWizard
 import com.prakashspicesfsm.features.login.model.LoginStateListDataModel
 import com.prakashspicesfsm.features.login.model.productlistmodel.ProductRateDataModel
 import com.elvishew.xlog.XLog
@@ -811,6 +813,14 @@ class AppUtils {
 
         }
 
+        fun capitalizeCustom(str: String): String? {
+            if(str.contains("N.A",ignoreCase = true)){
+                return str.toUpperCase()
+            }
+            return str.trim().split("\\s+".toRegex())
+                .joinToString(" ") { it.capitalize() }
+        }
+
 
         fun hideSoftKeyboardFromDialog(activity: Activity) {
             try {
@@ -1282,6 +1292,45 @@ class AppUtils {
             return info != null && info.isAvailable && info.isConnected
         }
 
+        fun endShopDuration(shopId: String,mContext: Context) {
+            val shopActiList = AppDatabase.getDBInstance()!!.shopActivityDao().getShopForDay(shopId, AppUtils.getCurrentDateForShopActi())
+            if (shopActiList.isEmpty())
+                return
+            if (!Pref.isMultipleVisitEnable) {
+                if (!shopActiList[0].isDurationCalculated && !shopActiList[0].isUploaded) {
+                    AppUtils.changeLanguage(mContext, "en")
+                    val endTimeStamp = System.currentTimeMillis().toString()
+                    val startTimestamp = shopActiList[0].startTimeStamp
+
+                    val duration = AppUtils.getTimeFromTimeSpan(startTimestamp, endTimeStamp)
+                    val totalMinute = AppUtils.getMinuteFromTimeStamp(startTimestamp, endTimeStamp)
+
+                    AppDatabase.getDBInstance()!!.shopActivityDao().updateEndTimeOfShop(endTimeStamp, shopActiList[0].shopid!!, AppUtils.getCurrentDateForShopActi())
+                    AppDatabase.getDBInstance()!!.shopActivityDao().updateIsUploaded(false, shopActiList[0].shopid!!, AppUtils.getCurrentDateForShopActi())
+                    AppDatabase.getDBInstance()!!.shopActivityDao().updateTotalMinuteForDayOfShop(shopActiList[0].shopid!!, totalMinute, AppUtils.getCurrentDateForShopActi())
+                    AppDatabase.getDBInstance()!!.shopActivityDao().updateTimeDurationForDayOfShop(shopActiList[0].shopid!!, duration, AppUtils.getCurrentDateForShopActi())
+                    AppDatabase.getDBInstance()!!.shopActivityDao().updateDurationAvailable(true, shopActiList[0].shopid!!, AppUtils.getCurrentDateForShopActi())
+                    AppDatabase.getDBInstance()!!.shopActivityDao().updateOutTime(AppUtils.getCurrentTimeWithMeredian(), shopActiList[0].shopid!!, AppUtils.getCurrentDateForShopActi(), shopActiList[0].startTimeStamp)
+                    AppDatabase.getDBInstance()!!.shopActivityDao().updateOutLocation(LocationWizard.getNewLocationName(mContext, Pref.current_latitude.toDouble(), Pref.current_longitude.toDouble()), shopActiList[0].shopid!!, AppUtils.getCurrentDateForShopActi(), shopActiList[0].startTimeStamp)
+
+                    val netStatus = if (AppUtils.isOnline(mContext))
+                        "Online"
+                    else
+                        "Offline"
+
+                    val netType = if (AppUtils.getNetworkType(mContext).equals("wifi", ignoreCase = true))
+                        AppUtils.getNetworkType(mContext)
+                    else
+                        "Mobile ${AppUtils.mobNetType(mContext)}"
+
+                    AppDatabase.getDBInstance()!!.shopActivityDao().updateDeviceStatusReason(AppUtils.getDeviceName(), AppUtils.getAndroidVersion(),
+                        AppUtils.getBatteryPercentage(mContext).toString(), netStatus, netType.toString(), shopActiList[0].shopid!!, AppUtils.getCurrentDateForShopActi())
+
+                    Pref.isShopVisited = false
+                }
+            }
+        }
+
         fun getNetworkType(context: Context): String? {
             var networkType: String? = null
             val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -1372,15 +1421,13 @@ class AppUtils {
         fun getDeviceName(): String {
             val manufacturer = Build.MANUFACTURER
             val model = Build.MODEL
-            return if (model.toLowerCase().startsWith(manufacturer.toLowerCase())) {
-                capitalize(model)
-            } else {
+            return if (model.toLowerCase().startsWith(manufacturer.toLowerCase())) { capitalize(model) } else {
                 capitalize(manufacturer) + " " + model
             }
         }
 
 
-        private fun capitalize(s: String?): String {
+        private fun capitalize(s: String): String {
             if (s == null || s.isEmpty()) {
                 return ""
             }

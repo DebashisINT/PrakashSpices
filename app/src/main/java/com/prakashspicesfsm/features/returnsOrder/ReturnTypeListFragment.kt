@@ -679,6 +679,11 @@ class ReturnTypeListFragment : BaseFragment(), View.OnClickListener {
                 (mContext as DashboardActivity).showSnackMessage(getString(R.string.add_product_cart))
 
             }
+        },object : ProductListAdapter.OnProductDelClickListener{
+
+            override fun onProductDelClick(position: ProductListEntity) {
+                TODO("Not yet implemented")
+            }
         })
 
         rv_product_type_list.adapter = productAdapter

@@ -251,10 +251,13 @@ class AddFeedbackSingleBtnDialog : DialogFragment(), View.OnClickListener {
             R.id.ok_TV -> {
                 iv_close_icon.isEnabled=true
 
+                var str_remarks =  ""
+                str_remarks = tv_remarks_dropdown.text.toString().trim().toString()
+
                 var msg = ""
-                    if(TextUtils.isEmpty(tv_remarks_dropdown.text.toString().trim()) && Pref.isShowVisitRemarks)
+                    if(TextUtils.isEmpty(tv_remarks_dropdown.text.toString().trim().toString()) && Pref.isShowVisitRemarks)
                         msg =  "Please put the remarks"
-                    else if(TextUtils.isEmpty(et_feedback.text.toString().trim()))
+                    else if(TextUtils.isEmpty(et_feedback.text.toString().trim()) && str_remarks.equals(""))
                         msg = "Please put the feedback"
 
 
@@ -283,10 +286,13 @@ class AddFeedbackSingleBtnDialog : DialogFragment(), View.OnClickListener {
             }
             R.id.iv_close_icon -> {
 
+                var str_remarks =  ""
+                str_remarks = tv_remarks_dropdown.text.toString().trim().toString()
+
                 var msg = ""
                 if(TextUtils.isEmpty(tv_remarks_dropdown.text.toString().trim()) && Pref.isShowVisitRemarks)
                     msg =  "Please put the remarks"
-                else if(TextUtils.isEmpty(et_feedback.text.toString().trim()))
+                else if(TextUtils.isEmpty(et_feedback.text.toString().trim()) && str_remarks.equals(""))
                     msg = "Please put the feedback"
 
                 //if (Pref.RevisitRemarksMandatory && TextUtils.isEmpty(tv_remarks_dropdown.text.toString().trim()))

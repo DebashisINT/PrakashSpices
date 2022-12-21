@@ -1483,6 +1483,9 @@ class LocationFuzedService : Service(), GoogleApiClient.ConnectionCallbacks, Goo
     }
 
     private fun endShopDuration(shopId: String) {
+        if(Pref.IsmanualInOutTimeRequired){
+            return
+        }
         val shopActiList = AppDatabase.getDBInstance()!!.shopActivityDao().getShopForDay(shopId, AppUtils.getCurrentDateForShopActi())
         if (shopActiList.isEmpty())
             return

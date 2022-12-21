@@ -15,6 +15,7 @@ import android.util.Log
 import android.widget.RemoteViews
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import com.prakashspicesfsm.CustomStatic
 import com.prakashspicesfsm.R
 import com.prakashspicesfsm.app.AppConstant
 import com.prakashspicesfsm.app.AppDatabase
@@ -1447,6 +1448,9 @@ class NotificationUtils(headerText: String, bodyText: String, shopId: String, lo
         shopIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
 
         val pendingIntent: PendingIntent = PendingIntent.getActivity(applicationContext, 1, shopIntent, PendingIntent.FLAG_IMMUTABLE)
+
+        var remoteMsg = remoteMessage?.data?.get("body").toString()
+        CustomStatic.QutoNoFromNoti = remoteMsg.substring(remoteMsg.indexOf("(")+1, remoteMsg.indexOf(")"));
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channelId = AppUtils.notificationChannelId
