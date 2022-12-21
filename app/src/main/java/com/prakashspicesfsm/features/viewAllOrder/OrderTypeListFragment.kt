@@ -258,14 +258,32 @@ class OrderTypeListFragment : BaseFragment(), View.OnClickListener {
 
         (mContext as DashboardActivity).setSearchListener(object : SearchListener {
             override fun onSearchQueryListener(query: String) {
-                if (query.isBlank()) {
-                    if (productList != null && productList!!.size > 0) {
-                        productAdapter?.updateList(productList!!)
+                if(Pref.IsShowNewOrderCart){
+                    CustomStatic.productQtyEdi = HashMap()
+                    CustomStatic.productRateEdi = HashMap()
+                    CustomStatic.productAddedID = ArrayList()
+                    if (query.isBlank()) {
+                        if (productList != null && productList!!.size > 0) {
+                            productAdapter?.updateList(productList!!)
+                        }
+                    } else {
+                        if (productList != null && productList!!.size > 0)
+                            productAdapter?.filter?.filter(query)
+
                     }
-                } else {
-                    if (productList != null && productList!!.size > 0)
-                        productAdapter?.filter?.filter(query)
                 }
+                else{
+                    if (query.isBlank()) {
+                        if (productList != null && productList!!.size > 0) {
+                            productAdapter?.updateList(productList!!)
+                        }
+                    } else {
+                        if (productList != null && productList!!.size > 0)
+                            productAdapter?.filter?.filter(query)
+
+                    }
+                }
+
             }
         })
 

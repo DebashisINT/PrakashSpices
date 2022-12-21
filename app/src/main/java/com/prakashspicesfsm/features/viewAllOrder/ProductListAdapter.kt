@@ -51,6 +51,7 @@ class ProductListAdapter(
     private var tempProductList: ArrayList<ProductListEntity>
     private var filteredProductList: ArrayList<ProductListEntity>
 
+
     init {
         layoutInflater = LayoutInflater.from(context)
 
@@ -97,6 +98,7 @@ class ProductListAdapter(
                       shopId: String) {
 
             println(" tag_tag adapter pos : $adapterPosition")
+
 
             if (adapterPosition % 2 == 0)
                 itemView.setBackgroundColor(ContextCompat.getColor(context, R.color.report_screen_bg))
