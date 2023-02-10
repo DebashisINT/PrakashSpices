@@ -658,7 +658,7 @@ private fun callUpdateGpsStatusApi(list: List<GpsStatusEntity>) {
                         }
 
                         i++
-                        if (i < list.size) {
+                        if (i < list.size && false) {
                             callUpdateGpsStatusApi(list)
                         } else {
                             i = 0
@@ -671,7 +671,7 @@ private fun callUpdateGpsStatusApi(list: List<GpsStatusEntity>) {
                         XLog.d("GPS_STATUS : " + "RESPONSE ERROR: " + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + error.localizedMessage)
                         error.printStackTrace()
                         i++
-                        if (i < list.size) {
+                        if (i < list.size  && false) {
                             callUpdateGpsStatusApi(list)
                         } else {
                             i = 0

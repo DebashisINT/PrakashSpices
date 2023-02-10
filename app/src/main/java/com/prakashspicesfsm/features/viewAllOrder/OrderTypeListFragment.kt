@@ -3,6 +3,7 @@ package com.prakashspicesfsm.features.viewAllOrder
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.speech.tts.TextToSpeech
 import android.text.Editable
 import android.text.TextUtils
@@ -264,22 +265,34 @@ class OrderTypeListFragment : BaseFragment(), View.OnClickListener {
                     CustomStatic.productAddedID = ArrayList()
                     if (query.isBlank()) {
                         if (productList != null && productList!!.size > 0) {
-                            productAdapter?.updateList(productList!!)
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                productAdapter?.updateList(productList!!)
+                            }, 2000)
+
                         }
                     } else {
                         if (productList != null && productList!!.size > 0)
-                            productAdapter?.filter?.filter(query)
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                productAdapter?.filter?.filter(query)
+                            }, 2000)
+
 
                     }
                 }
                 else{
                     if (query.isBlank()) {
                         if (productList != null && productList!!.size > 0) {
-                            productAdapter?.updateList(productList!!)
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                productAdapter?.updateList(productList!!)
+                            }, 2000)
+//                            productAdapter?.updateList(productList!!)
                         }
                     } else {
                         if (productList != null && productList!!.size > 0)
-                            productAdapter?.filter?.filter(query)
+                            Handler(Looper.getMainLooper()).postDelayed({
+                                productAdapter?.filter?.filter(query)
+                            }, 2000)
+//                            productAdapter?.filter?.filter(query)
 
                     }
                 }
@@ -792,12 +805,18 @@ class OrderTypeListFragment : BaseFragment(), View.OnClickListener {
                 if (TextUtils.isEmpty(tv_search_frag_order_type_list.text.toString().trim())) {
                     if (productList != null && productList!!.size > 0) {
                         progress_wheel.stopSpinning()
-                        productAdapter?.updateList(productList!!)
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            productAdapter?.updateList(productList!!)
+                        }, 2000)
+
                     }
                 } else {
                     if (productList != null && productList!!.size > 0)
                         progress_wheel.stopSpinning()
-                    productAdapter?.filter?.filter(tv_search_frag_order_type_list.text.toString().trim())
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        productAdapter?.filter?.filter(tv_search_frag_order_type_list.text.toString().trim())
+                    }, 2000)
+
                 }
             }
 

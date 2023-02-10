@@ -2,6 +2,8 @@ package com.prakashspicesfsm.features.viewAllOrder
 
 import android.content.Context
 import android.graphics.Color
+import android.os.Handler
+import android.os.Looper
 import android.text.*
 import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
@@ -369,6 +371,8 @@ class ProductListAdapter(
                 itemView.ll_qty_rt_product_new_list.visibility = View.GONE
             }
 
+
+            Handler(Looper.getMainLooper()).postDelayed({
                 itemView.iv_prod_new_list_tick.setOnClickListener {
                     if(CustomStatic.productAddedID.contains(categoryList?.get(adapterPosition)!!.id)){
                         (context as DashboardActivity).showSnackMessage("This product has already added to cart")
@@ -411,8 +415,13 @@ class ProductListAdapter(
                         println("tag_list_show rate hash : ${CustomStatic.productRateEdi.get(keyL[i])}")
                     }
 
+
                     listener.onProductClick(categoryList!!.get(adapterPosition), adapterPosition)
+
+
                 }
+            }, 2000)
+
 
                 itemView.iv_prod_new_list_cross.setOnClickListener {
                     CustomStatic.productAddedID.remove(categoryList?.get(adapterPosition)!!.id)

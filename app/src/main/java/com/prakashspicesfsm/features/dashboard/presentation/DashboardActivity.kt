@@ -4431,7 +4431,7 @@ class DashboardActivity : BaseActivity(), View.OnClickListener, BaseNavigation, 
                 Handler().postDelayed(Runnable {
                     setTopBarTitle(getString(R.string.search_product)+"    ")
                     setTopBarVisibility(TopBarConfig.CART)
-                }, 2500)
+                }, 1500)    // 2500 delay 1500
             }
             FragType.ReturnTypeListFragment -> {
                 if (enableFragGeneration) {
