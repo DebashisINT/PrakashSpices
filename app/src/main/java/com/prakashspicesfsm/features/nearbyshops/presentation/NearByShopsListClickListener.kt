@@ -1,5 +1,7 @@
 package com.prakashspicesfsm.features.nearbyshops.presentation
 
+import com.prakashspicesfsm.app.domain.AddShopDBModelEntity
+
 /**
  * Created by Pratishruti on 30-10-2017.
  */
@@ -15,6 +17,7 @@ interface NearByShopsListClickListener {
     fun onQuotationClick(position: Int)
     fun onActivityClick(position: Int)
     fun onShareClick(position: Int)
+    fun onLocationShareClick(position: Int)
     fun onCollectionClick(position: Int)
     fun onWhatsAppClick(no: String)
     fun onSmsClick(no: String)
@@ -28,4 +31,8 @@ interface NearByShopsListClickListener {
     fun onDamageClick(shop_id: String)
     fun onSurveyClick(shop_id: String)
     fun onMultipleImageClick(shop: Any,position: Int)
+
+    fun onExtraContactClick(shop_idSel: String)
+
+    fun onUpdateStatusClick(obj: AddShopDBModelEntity)
 }

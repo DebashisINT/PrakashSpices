@@ -1,6 +1,7 @@
 package com.prakashspicesfsm.features.nearbyshops.api
 
 import com.prakashspicesfsm.app.NetworkConstant
+import com.prakashspicesfsm.base.BaseResponse
 import com.prakashspicesfsm.features.login.model.GetQtsAnsSubmitDtlsResponseModel
 import com.prakashspicesfsm.features.login.model.GetSecImageUploadResponseModel
 import com.prakashspicesfsm.features.login.model.productlistmodel.ModelListResponse
@@ -74,6 +75,10 @@ interface ShopListApi {
     @POST("RubyFoodLead/QuestionAnswerList")
     fun getQuestionAnsSubmitDetails(@Field("session_token") session_token:String,@Field("user_id") user_id:String)
             : Observable<GetQtsAnsSubmitDtlsResponseModel>
+
+    @FormUrlEncoded
+    @POST("EmployeeSync/UserIMEIClear")
+    fun deleteImeiAPI(@Field("session_token") session_token:String,@Field("user_id") user_id:String): Observable<BaseResponse>
 
 
     @FormUrlEncoded

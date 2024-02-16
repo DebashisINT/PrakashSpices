@@ -1,7 +1,12 @@
 package com.prakashspicesfsm;
 
+import android.content.Context;
+import android.database.Cursor;
+import android.provider.CallLog;
+
 import com.prakashspicesfsm.features.lead.model.CustomerListReq;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -39,6 +44,7 @@ public class CustomStatic {
 
     public static String FaceDetectionAccuracyLower="";
     public static String FaceDetectionAccuracyUpper="";
+    public static Boolean IsFaceRecognitionOnEyeblink=false;
 
     public static Boolean IsPowerSaverFragShowing=false;
 
@@ -51,6 +57,9 @@ public class CustomStatic {
 
     public static Boolean IsViewLeadFromInProcess=false;
     public static Boolean IsViewLeadAddUpdate=false;
+
+    public static Boolean IsViewTaskFromInProcess=false;
+    public static Boolean IsViewTaskAddUpdate=false;
     public static String ShopFeedBachHisUserId="";
 
     public static Boolean IsCollectionViewFromTeam = false;
@@ -63,5 +72,22 @@ public class CustomStatic {
     public static HashMap<Integer,String> productQtyEdi = new HashMap<>();
     public static HashMap<Integer,String> productRateEdi = new HashMap<>();
     public static ArrayList<Integer> productAddedID = new ArrayList<>();
+
+    public static Boolean IsAadhaarForPhotoReg=false;
+    public static Boolean IsVoterForPhotoReg=false;
+    public static Boolean IsPanForPhotoReg=false;
+    public static String FaceRegFaceImgPath="";
+    public static String AadhaarPicRegUrl="";
+    public static String FacePicRegUrl="";
+
+    public static String TeamUserSelect_user_id = "";
+
+    public static Boolean IsBackFromNewOptiCart = false;
+
+    public static String lead_msgBody = "";
+    public static String lead_msgLeadDate = "";
+    public static String lead_msgLeadEnquiry = "";
+
+    public static Boolean IsTeamAllParty = false;
 
 }

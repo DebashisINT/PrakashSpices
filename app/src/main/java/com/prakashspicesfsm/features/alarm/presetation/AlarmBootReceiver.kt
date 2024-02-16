@@ -10,7 +10,8 @@ import com.prakashspicesfsm.app.AlarmReceiver
 import com.prakashspicesfsm.app.Pref
 import com.prakashspicesfsm.app.utils.AppUtils
 import com.prakashspicesfsm.features.dashboard.presentation.ToastBroadcastReceiver
-import com.elvishew.xlog.XLog
+
+import timber.log.Timber
 
 
 /**
@@ -38,7 +39,7 @@ class AlarmBootReceiver : BroadcastReceiver() {
 
 
             if (!TextUtils.isEmpty(Pref.user_id)) {
-                XLog.e("=======================Boot Completed successfully ${AppUtils.getCurrentDateTime()} (AlarmBootReceiver)=======================")
+                Timber.e("=======================Boot Completed successfully ${AppUtils.getCurrentDateTime()} (AlarmBootReceiver)=======================")
 
                 val toastIntent = Intent(context, ToastBroadcastReceiver::class.java)
                 //val toastAlarmIntent = PendingIntent.getBroadcast(context, 1, toastIntent, PendingIntent.FLAG_UPDATE_CURRENT)

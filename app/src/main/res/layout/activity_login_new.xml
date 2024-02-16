@@ -46,16 +46,17 @@
 
                 <ImageView
                     android:id="@+id/logo_new"
-                    android:layout_width="@dimen/_155sdp"
-                    android:layout_height="@dimen/_70sdp"
+                    android:layout_width="@dimen/_185sdp"
+                    android:layout_height="@dimen/_78sdp"
                     android:src="@drawable/breezelogo"
                     android:layout_marginTop="@dimen/_30sdp"
                     android:layout_centerHorizontal="true"
                     android:gravity="center|center_horizontal"
                     android:layout_gravity="center"
-                    />
+                  />
 
                 <com.prakashspicesfsm.widgets.AppCustomTextView
+                    android:visibility="gone"
                     android:id="@+id/Logo_name_TV"
                     android:layout_below="@+id/logo_new"
                     android:layout_width="wrap_content"
@@ -67,7 +68,6 @@
                     android:textColor="#287fb2"
                     android:text="@string/name_filed_managenent_system"
                     android:textSize="@dimen/_12sdp"
-                    android:visibility="gone"
                     android:layout_marginTop="@dimen/_10sdp"/>
 
                 <com.prakashspicesfsm.widgets.AppCustomTextView
@@ -102,109 +102,112 @@
 
 
                             <LinearLayout
-                                android:background="@drawable/new_login_bg_newscre"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:layout_marginRight="@dimen/_30sdp"
-                                android:paddingTop="@dimen/_10sdp"
-                                android:paddingBottom="@dimen/_10sdp"
-                                android:elevation="@dimen/_3sdp">
-
-                                <LinearLayout
+                                    android:background="@drawable/new_login_bg_newscre"
                                     android:layout_width="match_parent"
-                                    android:orientation="horizontal"
-                                    android:layout_height="@dimen/_45sdp"
-                                    android:layout_marginLeft="@dimen/_10sdp"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
                                     android:layout_marginRight="@dimen/_30sdp"
-                                    android:gravity="center|start">
+                                    android:paddingTop="@dimen/_10sdp"
+                                    android:paddingBottom="@dimen/_10sdp"
+                                    android:elevation="@dimen/_3sdp">
 
-                                    <ImageView
-                                        android:layout_width="@dimen/_20sdp"
-                                        android:src="@drawable/ic_user_newscr"
-                                        android:layout_gravity="center"
-                                        android:layout_height="@dimen/_25sdp"
-                                        android:layout_marginTop="@dimen/_3sdp"/>
-
-                                    <com.google.android.material.textfield.TextInputLayout
-                                        android:layout_width="match_parent"
-                                        android:layout_height="@dimen/_35sdp"
-                                        android:textColorHint="@color/gray"
-                                        android:background="@color/transparent"
-                                        android:layout_gravity="center"
-                                        app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
-
-                                        <com.prakashspicesfsm.widgets.AppCustomEditText
-                                            android:id="@+id/username_EDT"
+                                        <LinearLayout
                                             android:layout_width="match_parent"
-                                            android:layout_height="match_parent"
-                                            android:hint="@string/username_new"
-                                            android:imeOptions="actionNext"
-                                            android:layout_gravity="center"
-                                            android:background="@color/transparent"
-                                            android:inputType="textEmailAddress"
-                                            android:singleLine="true"
-                                            android:paddingStart="@dimen/_10sdp"
-                                            android:textSize="@dimen/_13sdp"
-                                            app:theme="@style/EvoEditTextTheme" />
+                                            android:orientation="horizontal"
+                                            android:layout_height="@dimen/_45sdp"
+                                            android:layout_marginLeft="@dimen/_10sdp"
+                                            android:layout_marginRight="@dimen/_30sdp"
+                                            android:gravity="center|start">
 
-                                    </com.google.android.material.textfield.TextInputLayout>
+                                            <ImageView
+                                                android:layout_width="@dimen/_20sdp"
+                                                android:src="@drawable/ic_user_newscr"
+                                                android:layout_gravity="center"
+                                                android:layout_height="@dimen/_25sdp"
+                                                android:layout_marginTop="@dimen/_3sdp"/>
+
+                                            <com.google.android.material.textfield.TextInputLayout
+                                                android:layout_width="match_parent"
+                                                android:layout_height="@dimen/_35sdp"
+                                                android:textColorHint="@color/gray"
+                                                android:background="@color/transparent"
+                                                android:layout_gravity="center"
+                                                app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+
+                                                <com.prakashspicesfsm.widgets.AppCustomEditText
+                                                    android:id="@+id/username_EDT"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="match_parent"
+                                                    android:hint="@string/username_new"
+                                                    android:imeOptions="actionNext"
+                                                    android:layout_gravity="center"
+                                                    android:background="@color/transparent"
+                                                    android:inputType="textEmailAddress"
+                                                    android:singleLine="true"
+                                                    android:focusable="true"
+                                                    android:cursorVisible="true"
+                                                    android:paddingStart="@dimen/_10sdp"
+                                                    android:textSize="@dimen/_13sdp"
+                                                    app:theme="@style/EvoEditTextTheme" />
+
+                                            </com.google.android.material.textfield.TextInputLayout>
+
+                                        </LinearLayout>
+
+                                        <View
+                                            android:layout_width="match_parent"
+                                            android:layout_height="1dp"
+                                            android:layout_marginTop="@dimen/_5sdp"
+                                            android:layout_marginBottom="@dimen/_1sdp"
+                                            android:background="@color/card_custom_back1"
+                                            android:layout_marginLeft="@dimen/_10sdp"
+                                            android:layout_marginRight="@dimen/_10sdp" />
+
+                                        <LinearLayout
+                                            android:layout_width="match_parent"
+                                            android:layout_height="@dimen/_45sdp"
+                                            android:orientation="horizontal"
+                                            android:layout_marginLeft="@dimen/_10sdp"
+                                            android:layout_marginRight="@dimen/_30sdp"
+                                            android:gravity="center|start">
+
+                                            <ImageView
+                                                android:layout_width="@dimen/_20sdp"
+                                                android:layout_height="@dimen/_25sdp"
+                                                android:src="@drawable/ic_padlock"
+                                                android:layout_gravity="center"
+                                                android:layout_marginTop="@dimen/_3sdp"/>
+
+                                            <com.google.android.material.textfield.TextInputLayout
+                                                android:layout_width="match_parent"
+                                                android:layout_height="@dimen/_35sdp"
+                                                android:textColorHint="@color/gray"
+                                                app:passwordToggleEnabled="true"
+                                                android:layout_gravity="center"
+                                                android:background="@color/transparent"
+                                                app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
+
+                                                <com.google.android.material.textfield.TextInputEditText
+                                                    android:id="@+id/password_EDT"
+                                                    android:layout_width="match_parent"
+                                                    android:layout_height="match_parent"
+                                                    android:layout_gravity="center"
+                                                    android:background="@color/transparent"
+                                                    android:hint="@string/password"
+                                                    android:imeOptions="actionDone"
+                                                    android:inputType="textPassword"
+                                                    android:paddingStart="@dimen/_10sdp"
+                                                    android:singleLine="true"
+                                                    android:textSize="@dimen/_13sdp"
+                                                    app:theme="@style/EvoEditTextTheme"
+                                                    android:textCursorDrawable="@drawable/custom_cursor"/>
+
+                                            </com.google.android.material.textfield.TextInputLayout>
+
+                                        </LinearLayout>
+
 
                                 </LinearLayout>
-
-                                <View
-                                    android:layout_width="match_parent"
-                                    android:layout_height="1dp"
-                                    android:layout_marginTop="@dimen/_5sdp"
-                                    android:layout_marginBottom="@dimen/_1sdp"
-                                    android:background="@color/card_custom_back1"
-                                    android:layout_marginLeft="@dimen/_10sdp"
-                                    android:layout_marginRight="@dimen/_10sdp" />
-
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="@dimen/_45sdp"
-                                    android:orientation="horizontal"
-                                    android:layout_marginLeft="@dimen/_10sdp"
-                                    android:layout_marginRight="@dimen/_30sdp"
-                                    android:gravity="center|start">
-
-                                    <ImageView
-                                        android:layout_width="@dimen/_20sdp"
-                                        android:layout_height="@dimen/_25sdp"
-                                        android:src="@drawable/ic_padlock"
-                                        android:layout_gravity="center"
-                                        android:layout_marginTop="@dimen/_3sdp"/>
-
-                                    <com.google.android.material.textfield.TextInputLayout
-                                        android:layout_width="match_parent"
-                                        android:layout_height="@dimen/_35sdp"
-                                        android:textColorHint="@color/gray"
-                                        app:passwordToggleEnabled="true"
-                                        android:layout_gravity="center"
-                                        android:background="@color/transparent"
-                                        app:hintTextAppearance="@style/TextAppearance.App.TextInputLayout">
-
-                                        <com.google.android.material.textfield.TextInputEditText
-                                            android:id="@+id/password_EDT"
-                                            android:layout_width="match_parent"
-                                            android:layout_height="match_parent"
-                                            android:layout_gravity="center"
-                                            android:background="@color/transparent"
-                                            android:hint="@string/password"
-                                            android:imeOptions="actionDone"
-                                            android:inputType="textPassword"
-                                            android:paddingStart="@dimen/_10sdp"
-                                            android:singleLine="true"
-                                            android:textSize="@dimen/_13sdp"
-                                            app:theme="@style/EvoEditTextTheme" />
-
-                                    </com.google.android.material.textfield.TextInputLayout>
-
-                                </LinearLayout>
-
-
-                            </LinearLayout>
 
                             <ImageView
                                 android:id="@+id/login_TV"
@@ -239,15 +242,15 @@
                             android:textColor="@color/colorPrimaryDark"
                             android:textSize="@dimen/_11sdp"/>
 
-                        <!--                        <androidx.appcompat.widget.SwitchCompat-->
-                        <!--                            android:id="@+id/cb_remember_me"-->
-                        <!--                            android:layout_width="wrap_content"-->
-                        <!--                            android:layout_height="@dimen/_35sdp"-->
-                        <!--                            wheel:switchMinWidth="@dimen/_35sdp"-->
-                        <!--                            wheel:switchPadding="@dimen/_5sdp"-->
-                        <!--                            android:text="Remember Me"-->
-                        <!--                            android:thumb="@drawable/login_rem_thumb_selector"-->
-                        <!--                            wheel:track="@drawable/login_rem_track_selector" />-->
+<!--                        <androidx.appcompat.widget.SwitchCompat-->
+<!--                            android:id="@+id/cb_remember_me"-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="@dimen/_35sdp"-->
+<!--                            wheel:switchMinWidth="@dimen/_35sdp"-->
+<!--                            wheel:switchPadding="@dimen/_5sdp"-->
+<!--                            android:text="Remember Me"-->
+<!--                            android:thumb="@drawable/login_rem_thumb_selector"-->
+<!--                            wheel:track="@drawable/login_rem_track_selector" />-->
 
                         <com.prakashspicesfsm.widgets.AppCustomTextView
                             android:id="@+id/share_log_login_TV"
@@ -320,46 +323,46 @@
                         android:textColor="@color/white"
                         android:textStyle="bold" />
 
-                    <!--                    <LinearLayout-->
-                    <!--                        android:id="@+id/activity_login_llList"-->
-                    <!--                        android:layout_width="wrap_content"-->
-                    <!--                        android:layout_height="wrap_content"-->
-                    <!--                        android:layout_marginTop="@dimen/_25sdp"-->
-                    <!--                        android:layout_marginHorizontal="@dimen/_5sdp"-->
-                    <!--                        android:background="@drawable/rect_stroke_solid_off_green"-->
-                    <!--                        android:orientation="vertical"-->
-                    <!--                        android:paddingHorizontal="@dimen/_8sdp"-->
-                    <!--                        android:paddingVertical="@dimen/_8sdp"-->
-                    <!--                        android:layout_marginStart="@dimen/_1sdp"-->
-                    <!--                        android:visibility="invisible">-->
+<!--                    <LinearLayout-->
+<!--                        android:id="@+id/activity_login_llList"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:layout_marginTop="@dimen/_25sdp"-->
+<!--                        android:layout_marginHorizontal="@dimen/_5sdp"-->
+<!--                        android:background="@drawable/rect_stroke_solid_off_green"-->
+<!--                        android:orientation="vertical"-->
+<!--                        android:paddingHorizontal="@dimen/_8sdp"-->
+<!--                        android:paddingVertical="@dimen/_8sdp"-->
+<!--                        android:layout_marginStart="@dimen/_1sdp"-->
+<!--                        android:visibility="invisible">-->
 
-                    <!--                        <com.prakashspicesfsm.widgets.AppCustomTextView-->
-                    <!--                            android:id="@+id/activity_login_tvappCustomAnydesk"-->
-                    <!--                            android:layout_width="wrap_content"-->
-                    <!--                            android:layout_height="wrap_content"-->
-                    <!--                            android:layout_gravity="center_vertical"-->
-                    <!--                            android:background="@drawable/selector_green_botton_bg_1"-->
-                    <!--                            android:gravity="center"-->
-                    <!--                            android:paddingHorizontal="@dimen/_10sdp"-->
-                    <!--                            android:paddingVertical="@dimen/_5sdp"-->
-                    <!--                            android:text="@string/report"-->
-                    <!--                            android:textColor="@color/white"-->
-                    <!--                            android:textSize="@dimen/_8sdp" />-->
+<!--                        <com.prakashspicesfsm.widgets.AppCustomTextView-->
+<!--                            android:id="@+id/activity_login_tvappCustomAnydesk"-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:layout_gravity="center_vertical"-->
+<!--                            android:background="@drawable/selector_green_botton_bg_1"-->
+<!--                            android:gravity="center"-->
+<!--                            android:paddingHorizontal="@dimen/_10sdp"-->
+<!--                            android:paddingVertical="@dimen/_5sdp"-->
+<!--                            android:text="@string/report"-->
+<!--                            android:textColor="@color/white"-->
+<!--                            android:textSize="@dimen/_8sdp" />-->
 
-                    <!--                        <com.prakashspicesfsm.widgets.AppCustomTextView-->
-                    <!--                            android:id="@+id/activity_login_tvappCustomLogs"-->
-                    <!--                            android:layout_width="wrap_content"-->
-                    <!--                            android:layout_height="wrap_content"-->
-                    <!--                            android:layout_gravity="center_vertical"-->
-                    <!--                            android:layout_marginTop="@dimen/_8sdp"-->
-                    <!--                            android:background="@drawable/selector_green_botton_bg_1"-->
-                    <!--                            android:gravity="center"-->
-                    <!--                            android:paddingHorizontal="@dimen/_10sdp"-->
-                    <!--                            android:paddingVertical="@dimen/_5sdp"-->
-                    <!--                            android:text="@string/share_log"-->
-                    <!--                            android:textColor="@color/white"-->
-                    <!--                            android:textSize="@dimen/_8sdp" />-->
-                    <!--                    </LinearLayout>-->
+<!--                        <com.prakashspicesfsm.widgets.AppCustomTextView-->
+<!--                            android:id="@+id/activity_login_tvappCustomLogs"-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:layout_gravity="center_vertical"-->
+<!--                            android:layout_marginTop="@dimen/_8sdp"-->
+<!--                            android:background="@drawable/selector_green_botton_bg_1"-->
+<!--                            android:gravity="center"-->
+<!--                            android:paddingHorizontal="@dimen/_10sdp"-->
+<!--                            android:paddingVertical="@dimen/_5sdp"-->
+<!--                            android:text="@string/share_log"-->
+<!--                            android:textColor="@color/white"-->
+<!--                            android:textSize="@dimen/_8sdp" />-->
+<!--                    </LinearLayout>-->
 
                 </LinearLayout>
 
@@ -373,6 +376,8 @@
                     android:text="@string/login_logout_msg"
                     android:textSize="@dimen/_11sdp"
                     android:textColor="@color/color_deep_blue" />
+
+
 
                 <ImageView
                     android:id="@+id/icon_internet"
@@ -404,14 +409,34 @@
         android:textSize="@dimen/_10sdp"
         android:visibility="visible" />
 
-    <com.pnikosis.materialishprogress.ProgressWheel
+
+    <!--<com.pnikosis.materialishprogress.ProgressWheel
         android:id="@+id/progress_wheel"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         wheel:matProg_barColor="@color/default_text_color"
-        wheel:matProg_progressIndeterminate="true" />
+        wheel:matProg_progressIndeterminate="true" />-->
+
+    <!-- loader work 25642 mantis -->
+
+    <ImageView
+        android:id="@+id/iv_background_color_set"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/color_transparent_blue"
+        android:visibility="gone"
+        />
+
+    <ImageView
+        android:id="@+id/iv_loader_spin"
+        android:layout_width="@dimen/_80sdp"
+        android:layout_height="@dimen/_80sdp"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        android:scaleType="centerCrop"
+        />
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/alert_snack_bar"

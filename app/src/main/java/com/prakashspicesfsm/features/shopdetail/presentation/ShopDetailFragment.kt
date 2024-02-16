@@ -62,7 +62,7 @@ import com.prakashspicesfsm.features.reimbursement.presentation.FullImageDialog
 import com.prakashspicesfsm.features.shopdetail.presentation.api.EditShopRepoProvider
 import com.prakashspicesfsm.widgets.AppCustomEditText
 import com.prakashspicesfsm.widgets.AppCustomTextView
-import com.elvishew.xlog.XLog
+
 import com.github.clans.fab.FloatingActionButton
 import com.github.clans.fab.FloatingActionMenu
 import com.hahnemann.features.commondialog.presentation.CommonDialogTripleBtn
@@ -74,6 +74,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.fragment_add_shop.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
+import timber.log.Timber
 import java.util.*
 
 /**
@@ -111,6 +112,7 @@ class ShopDetailFragment : BaseFragment(), View.OnClickListener {
     private lateinit var shop_type_TV: AppCustomTextView
     private lateinit var assigned_to_TV: AppCustomTextView
     private lateinit var iv_category_dropdown_icon: ImageView
+    private lateinit var rl_shop_dtls_model_root: RelativeLayout
 
     private lateinit var popup_image: ImageView
     private lateinit var overlay_rl: FrameLayout
@@ -525,6 +527,15 @@ class ShopDetailFragment : BaseFragment(), View.OnClickListener {
 
         whatsappp_no_TV = view.findViewById(R.id.whatsappp_no_TV)
 
+        //test code begin
+        rl_shop_dtls_model_root = view.findViewById(R.id.rl_shop_dtls_model_root)
+        if(Pref.isModelEnable){
+            rl_shop_dtls_model_root.visibility = View.VISIBLE
+        }else{
+            rl_shop_dtls_model_root.visibility = View.GONE
+        }
+        //test code end
+
         shop_name_label_TV.text = "Name"
 
         /*14-12-2021*/
@@ -559,7 +570,10 @@ class ShopDetailFragment : BaseFragment(), View.OnClickListener {
 
         if (Pref.isCustomerFeatureEnable) {
             ll_customer_view.visibility = View.VISIBLE
-            owner_name_RL.visibility = View.GONE
+            //Begin Puja 16.11.23 mantis-0026997 //
+          //  owner_name_RL.visibility = View.GONE
+            owner_name_RL.visibility = View.VISIBLE
+            //End Puja 16.11.23 mantis-0026997 //
             owner_contact_no_label_TV.text = getString(R.string.contact_number)
             owner_email_label_TV.text = getString(R.string.only_email)
         } else {
@@ -1439,7 +1453,8 @@ class ShopDetailFragment : BaseFragment(), View.OnClickListener {
                 showRevisitActionDialog()
             }
 
-        } else {
+        }
+        else {
             disabledEntry()
 
             if (AppUtils.isShopAdded) {
@@ -3609,7 +3624,7 @@ class ShopDetailFragment : BaseFragment(), View.OnClickListener {
                         .subscribe({ result ->
                             //val response = result as ModelListResponseModel
                             val response = result as ModelListResponse
-                            XLog.d("GET MODEL DATA : " + "RESPONSE : " + response.status + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + response.message)
+                            Timber.d("GET MODEL DATA : " + "RESPONSE : " + response.status + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + response.message)
                             if (response.status == NetworkConstant.SUCCESS) {
 
                                 if (response.model_list != null && response.model_list!!.isNotEmpty()) {
@@ -3644,7 +3659,7 @@ class ShopDetailFragment : BaseFragment(), View.OnClickListener {
 
                         }, { error ->
                             progress_wheel.stopSpinning()
-                            XLog.d("GET MODEL DATA : " + "ERROR : " + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + error.localizedMessage)
+                            Timber.d("GET MODEL DATA : " + "ERROR : " + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + error.localizedMessage)
                             error.printStackTrace()
                             (mContext as DashboardActivity).showSnackMessage(getString(R.string.something_went_wrong))
                         })
@@ -3675,7 +3690,7 @@ class ShopDetailFragment : BaseFragment(), View.OnClickListener {
                         .subscribeOn(Schedulers.io())
                         .subscribe({ result ->
                             val response = result as PrimaryAppListResponseModel
-                            XLog.d("GET PRIMARY APP DATA : " + "RESPONSE : " + response.status + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + response.message)
+                            Timber.d("GET PRIMARY APP DATA : " + "RESPONSE : " + response.status + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + response.message)
                             if (response.status == NetworkConstant.SUCCESS) {
 
                                 if (response.primary_application_list != null && response.primary_application_list!!.isNotEmpty()) {
@@ -3708,7 +3723,7 @@ class ShopDetailFragment : BaseFragment(), View.OnClickListener {
 
                         }, { error ->
                             progress_wheel.stopSpinning()
-                            XLog.d("GET PRIMARY APP DATA : " + "ERROR : " + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + error.localizedMessage)
+                            Timber.d("GET PRIMARY APP DATA : " + "ERROR : " + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + error.localizedMessage)
                             error.printStackTrace()
                             (mContext as DashboardActivity).showSnackMessage(getString(R.string.something_went_wrong))
                         })
@@ -3739,7 +3754,7 @@ class ShopDetailFragment : BaseFragment(), View.OnClickListener {
                         .subscribeOn(Schedulers.io())
                         .subscribe({ result ->
                             val response = result as SecondaryAppListResponseModel
-                            XLog.d("GET SECONDARY APP DATA : " + "RESPONSE : " + response.status + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + response.message)
+                            Timber.d("GET SECONDARY APP DATA : " + "RESPONSE : " + response.status + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + response.message)
                             if (response.status == NetworkConstant.SUCCESS) {
 
                                 if (response.secondary_application_list != null && response.secondary_application_list!!.isNotEmpty()) {
@@ -3772,7 +3787,7 @@ class ShopDetailFragment : BaseFragment(), View.OnClickListener {
 
                         }, { error ->
                             progress_wheel.stopSpinning()
-                            XLog.d("GET SECONDARY APP DATA : " + "ERROR : " + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + error.localizedMessage)
+                            Timber.d("GET SECONDARY APP DATA : " + "ERROR : " + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + error.localizedMessage)
                             error.printStackTrace()
                             (mContext as DashboardActivity).showSnackMessage(getString(R.string.something_went_wrong))
                         })
@@ -3802,7 +3817,7 @@ class ShopDetailFragment : BaseFragment(), View.OnClickListener {
                         .subscribeOn(Schedulers.io())
                         .subscribe({ result ->
                             val response = result as LeadListResponseModel
-                            XLog.d("GET LEAD TYPE DATA : " + "RESPONSE : " + response.status + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + response.message)
+                            Timber.d("GET LEAD TYPE DATA : " + "RESPONSE : " + response.status + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + response.message)
                             if (response.status == NetworkConstant.SUCCESS) {
 
                                 if (response.lead_type_list != null && response.lead_type_list!!.isNotEmpty()) {
@@ -3835,7 +3850,7 @@ class ShopDetailFragment : BaseFragment(), View.OnClickListener {
 
                         }, { error ->
                             progress_wheel.stopSpinning()
-                            XLog.d("GET LEAD TYPE DATA : " + "ERROR : " + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + error.localizedMessage)
+                            Timber.d("GET LEAD TYPE DATA : " + "ERROR : " + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + error.localizedMessage)
                             error.printStackTrace()
                             (mContext as DashboardActivity).showSnackMessage(getString(R.string.something_went_wrong))
                         })
@@ -3865,7 +3880,7 @@ class ShopDetailFragment : BaseFragment(), View.OnClickListener {
                         .subscribeOn(Schedulers.io())
                         .subscribe({ result ->
                             val response = result as StageListResponseModel
-                            XLog.d("GET STAGE DATA : " + "RESPONSE : " + response.status + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + response.message)
+                            Timber.d("GET STAGE DATA : " + "RESPONSE : " + response.status + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + response.message)
                             if (response.status == NetworkConstant.SUCCESS) {
 
                                 if (response.stage_list != null && response.stage_list!!.isNotEmpty()) {
@@ -3898,7 +3913,7 @@ class ShopDetailFragment : BaseFragment(), View.OnClickListener {
 
                         }, { error ->
                             progress_wheel.stopSpinning()
-                            XLog.d("GET STAGE DATA : " + "ERROR : " + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + error.localizedMessage)
+                            Timber.d("GET STAGE DATA : " + "ERROR : " + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + error.localizedMessage)
                             error.printStackTrace()
                             (mContext as DashboardActivity).showSnackMessage(getString(R.string.something_went_wrong))
                         })
@@ -3929,7 +3944,7 @@ class ShopDetailFragment : BaseFragment(), View.OnClickListener {
                         .subscribeOn(Schedulers.io())
                         .subscribe({ result ->
                             val response = result as FunnelStageListResponseModel
-                            XLog.d("GET FUNNEL STAGE DATA : " + "RESPONSE : " + response.status + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + response.message)
+                            Timber.d("GET FUNNEL STAGE DATA : " + "RESPONSE : " + response.status + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + response.message)
                             if (response.status == NetworkConstant.SUCCESS) {
 
                                 if (response.funnel_stage_list != null && response.funnel_stage_list!!.isNotEmpty()) {
@@ -3962,7 +3977,7 @@ class ShopDetailFragment : BaseFragment(), View.OnClickListener {
 
                         }, { error ->
                             progress_wheel.stopSpinning()
-                            XLog.d("GET FUNNEL STAGE DATA : " + "ERROR : " + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + error.localizedMessage)
+                            Timber.d("GET FUNNEL STAGE DATA : " + "ERROR : " + "\n" + "Time : " + AppUtils.getCurrentDateTime() + ", USER :" + Pref.user_name + ",MESSAGE : " + error.localizedMessage)
                             error.printStackTrace()
                             (mContext as DashboardActivity).showSnackMessage(getString(R.string.something_went_wrong))
                         })
@@ -4731,6 +4746,20 @@ class ShopDetailFragment : BaseFragment(), View.OnClickListener {
 
     private var permissionUtils: PermissionUtils? = null
     private fun initPermissionCheck() {
+
+        //begin mantis id 26741 Storage permission updation Suman 22-08-2023
+        var permissionList = arrayOf<String>( Manifest.permission.CAMERA)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
+            permissionList += Manifest.permission.READ_MEDIA_IMAGES
+            permissionList += Manifest.permission.READ_MEDIA_AUDIO
+            permissionList += Manifest.permission.READ_MEDIA_VIDEO
+        }else{
+            permissionList += Manifest.permission.WRITE_EXTERNAL_STORAGE
+            permissionList += Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+//end mantis id 26741 Storage permission updation Suman 22-08-2023
+
         permissionUtils = PermissionUtils(mContext as Activity, object : PermissionUtils.OnPermissionListener {
             override fun onPermissionGranted() {
                 if (isDocDegree == 1)
@@ -4742,8 +4771,8 @@ class ShopDetailFragment : BaseFragment(), View.OnClickListener {
             override fun onPermissionNotGranted() {
                 (mContext as DashboardActivity).showSnackMessage(getString(R.string.accept_permission))
             }
-
-        }, arrayOf<String>(Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE))
+// mantis id 26741 Storage permission updation Suman 22-08-2023
+        },permissionList)// arrayOf<String>(Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE))
     }
 
     fun onRequestPermission(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -4811,7 +4840,7 @@ class ShopDetailFragment : BaseFragment(), View.OnClickListener {
             (mContext as DashboardActivity).showSnackMessage(getString(R.string.valid_amount_error))
         else if (Pref.isAreaVisible && (Pref.isAreaMandatoryInPartyCreation && TextUtils.isEmpty(areaId)))
             (mContext as DashboardActivity).showSnackMessage(getString(R.string.error_select_area))
-        else if (Pref.isCustomerFeatureEnable && TextUtils.isEmpty(modelId))
+        else if (Pref.isCustomerFeatureEnable && TextUtils.isEmpty(modelId) && Pref.isModelEnable)//test code begin
             (mContext as DashboardActivity).showSnackMessage(getString(R.string.error_select_model))
         else if (Pref.isCustomerFeatureEnable && TextUtils.isEmpty(stageId))
             (mContext as DashboardActivity).showSnackMessage(getString(R.string.error_select_stage))
@@ -4988,7 +5017,7 @@ class ShopDetailFragment : BaseFragment(), View.OnClickListener {
 
         if (TextUtils.isEmpty(addShopData.actual_address)) {
             var address_ = LocationWizard.getAdressFromLatlng(mContext, addShopData.shopLat, addShopData.shopLong)
-            XLog.e("Actual Shop address (Update address)======> $address_")
+            Timber.e("Actual Shop address (Update address)======> $address_")
 
             if (address_.contains("http"))
                 address_ = "Unknown"
@@ -5202,6 +5231,28 @@ class ShopDetailFragment : BaseFragment(), View.OnClickListener {
             else
                 addShopReqData.ShopOwner_PAN = ""
 
+            // contact module
+            try{
+                addShopReqData.address = addShopData.address
+                addShopReqData.actual_address = addShopData.address
+                addShopReqData.shop_firstName= addShopData.crm_firstName
+                addShopReqData.shop_lastName=  addShopData.crm_lastName
+                addShopReqData.crm_companyID=  if(addShopData.companyName_id.equals("")) "0" else addShopData.companyName_id
+                addShopReqData.crm_jobTitle=  addShopData.jobTitle
+                addShopReqData.crm_typeID=  if(addShopData.crm_type_ID.equals("")) "0" else addShopData.crm_type_ID
+                addShopReqData.crm_statusID=  if(addShopData.crm_status_ID.equals("")) "0" else addShopData.crm_status_ID
+                addShopReqData.crm_sourceID= if(addShopData.crm_source_ID.equals("")) "0" else addShopData.crm_source_ID
+                addShopReqData.crm_reference=  addShopData.crm_reference
+                addShopReqData.crm_referenceID=  if(addShopData.crm_reference_ID.equals("")) "0" else addShopData.crm_reference_ID
+                addShopReqData.crm_referenceID_type=  addShopData.crm_reference_ID_type
+                addShopReqData.crm_stage_ID=  if(addShopData.crm_stage_ID.equals("")) "0" else addShopData.crm_stage_ID
+                addShopReqData.assign_to=  addShopData.crm_assignTo_ID
+                addShopReqData.saved_from_status=  addShopData.crm_saved_from
+            }catch (ex:Exception){
+                ex.printStackTrace()
+                Timber.d("Logout edit sync err ${ex.message}")
+            }
+
             callEditShopApi(addShopReqData, addShopData.shopImageLocalPath)
         } else {
             (mContext as DashboardActivity).showSnackMessage("Shop edited successfully")
@@ -5211,68 +5262,68 @@ class ShopDetailFragment : BaseFragment(), View.OnClickListener {
 
     private fun callEditShopApi(addShopReqData: AddShopRequestData, shopImageLocalPath: String?) {
 
-        XLog.d("=====EditShop Input Params (Shop Details)======")
-        XLog.d("shop id====> " + addShopReqData.shop_id)
+        Timber.d("=====EditShop Input Params (Shop Details)======")
+        Timber.d("shop id====> " + addShopReqData.shop_id)
         val index = addShopReqData.shop_id!!.indexOf("_")
-        XLog.d("decoded shop id====> " + addShopReqData.user_id + "_" + AppUtils.getDate(addShopReqData.shop_id!!.substring(index + 1, addShopReqData.shop_id!!.length).toLong()))
-        XLog.d("shop added date====> " + addShopReqData.added_date)
-        XLog.d("shop address====> " + addShopReqData.address)
-        XLog.d("assigned to dd id====> " + addShopReqData.assigned_to_dd_id)
-        XLog.d("assigned to pp id=====> " + addShopReqData.assigned_to_pp_id)
-        XLog.d("date aniversery=====> " + addShopReqData.date_aniversary)
-        XLog.d("dob====> " + addShopReqData.dob)
-        XLog.d("shop owner phn no===> " + addShopReqData.owner_contact_no)
-        XLog.d("shop owner email====> " + addShopReqData.owner_email)
-        XLog.d("shop owner name====> " + addShopReqData.owner_name)
-        XLog.d("shop pincode====> " + addShopReqData.pin_code)
-        XLog.d("session token====> " + addShopReqData.session_token)
-        XLog.d("shop lat====> " + addShopReqData.shop_lat)
-        XLog.d("shop long===> " + addShopReqData.shop_long)
-        XLog.d("shop name====> " + addShopReqData.shop_name)
-        XLog.d("shop type===> " + addShopReqData.type)
-        XLog.d("user id====> " + addShopReqData.user_id)
-        XLog.d("amount=======> " + addShopReqData.amount)
-        XLog.d("area id=======> " + addShopReqData.area_id)
-        XLog.d("model id=======> " + addShopReqData.model_id)
-        XLog.d("primary app id=======> " + addShopReqData.primary_app_id)
-        XLog.d("secondary app id=======> " + addShopReqData.secondary_app_id)
-        XLog.d("lead id=======> " + addShopReqData.lead_id)
-        XLog.d("stage id=======> " + addShopReqData.stage_id)
-        XLog.d("funnel stage id=======> " + addShopReqData.funnel_stage_id)
-        XLog.d("booking amount=======> " + addShopReqData.booking_amount)
-        XLog.d("type id=======> " + addShopReqData.type_id)
-        XLog.d("shop image path====> $shopImageLocalPath")
-        XLog.d("director name=======> " + addShopReqData.director_name)
-        XLog.d("family member dob=======> " + addShopReqData.family_member_dob)
-        XLog.d("key person's name=======> " + addShopReqData.key_person_name)
-        XLog.d("phone no=======> " + addShopReqData.phone_no)
-        XLog.d("additional dob=======> " + addShopReqData.addtional_dob)
-        XLog.d("additional doa=======> " + addShopReqData.addtional_doa)
-        XLog.d("doctor family member dob=======> " + addShopReqData.doc_family_member_dob)
-        XLog.d("specialization=======> " + addShopReqData.specialization)
-        XLog.d("average patient count per day=======> " + addShopReqData.average_patient_per_day)
-        XLog.d("category=======> " + addShopReqData.category)
-        XLog.d("doctor address=======> " + addShopReqData.doc_address)
-        XLog.d("doctor pincode=======> " + addShopReqData.doc_pincode)
-        XLog.d("chambers or hospital under same headquarter=======> " + addShopReqData.is_chamber_same_headquarter)
-        XLog.d("chamber related remarks=======> " + addShopReqData.is_chamber_same_headquarter_remarks)
-        XLog.d("chemist name=======> " + addShopReqData.chemist_name)
-        XLog.d("chemist name=======> " + addShopReqData.chemist_address)
-        XLog.d("chemist pincode=======> " + addShopReqData.chemist_pincode)
-        XLog.d("assistant name=======> " + addShopReqData.assistant_name)
-        XLog.d("assistant contact no=======> " + addShopReqData.assistant_contact_no)
-        XLog.d("assistant dob=======> " + addShopReqData.assistant_dob)
-        XLog.d("assistant date of anniversary=======> " + addShopReqData.assistant_doa)
-        XLog.d("assistant family dob=======> " + addShopReqData.assistant_family_dob)
-        XLog.d("doctor degree image path=======> $degreeImgLink")
-        XLog.d("entity id=======> " + addShopReqData.entity_id)
-        XLog.d("party status id=======> " + addShopReqData.party_status_id)
-        XLog.d("retailer id=======> " + addShopReqData.retailer_id)
-        XLog.d("dealer id=======> " + addShopReqData.dealer_id)
-        XLog.d("beat id=======> " + addShopReqData.beat_id)
-        XLog.d("assigned to shop id=======> " + addShopReqData.assigned_to_shop_id)
-        XLog.d("actual_address=======> " + addShopReqData.actual_address)
-        XLog.d("================================================")
+        Timber.d("decoded shop id====> " + addShopReqData.user_id + "_" + AppUtils.getDate(addShopReqData.shop_id!!.substring(index + 1, addShopReqData.shop_id!!.length).toLong()))
+        Timber.d("shop added date====> " + addShopReqData.added_date)
+        Timber.d("shop address====> " + addShopReqData.address)
+        Timber.d("assigned to dd id====> " + addShopReqData.assigned_to_dd_id)
+        Timber.d("assigned to pp id=====> " + addShopReqData.assigned_to_pp_id)
+        Timber.d("date aniversery=====> " + addShopReqData.date_aniversary)
+        Timber.d("dob====> " + addShopReqData.dob)
+        Timber.d("shop owner phn no===> " + addShopReqData.owner_contact_no)
+        Timber.d("shop owner email====> " + addShopReqData.owner_email)
+        Timber.d("shop owner name====> " + addShopReqData.owner_name)
+        Timber.d("shop pincode====> " + addShopReqData.pin_code)
+        Timber.d("session token====> " + addShopReqData.session_token)
+        Timber.d("shop lat====> " + addShopReqData.shop_lat)
+        Timber.d("shop long===> " + addShopReqData.shop_long)
+        Timber.d("shop name====> " + addShopReqData.shop_name)
+        Timber.d("shop type===> " + addShopReqData.type)
+        Timber.d("user id====> " + addShopReqData.user_id)
+        Timber.d("amount=======> " + addShopReqData.amount)
+        Timber.d("area id=======> " + addShopReqData.area_id)
+        Timber.d("model id=======> " + addShopReqData.model_id)
+        Timber.d("primary app id=======> " + addShopReqData.primary_app_id)
+        Timber.d("secondary app id=======> " + addShopReqData.secondary_app_id)
+        Timber.d("lead id=======> " + addShopReqData.lead_id)
+        Timber.d("stage id=======> " + addShopReqData.stage_id)
+        Timber.d("funnel stage id=======> " + addShopReqData.funnel_stage_id)
+        Timber.d("booking amount=======> " + addShopReqData.booking_amount)
+        Timber.d("type id=======> " + addShopReqData.type_id)
+        Timber.d("shop image path====> $shopImageLocalPath")
+        Timber.d("director name=======> " + addShopReqData.director_name)
+        Timber.d("family member dob=======> " + addShopReqData.family_member_dob)
+        Timber.d("key person's name=======> " + addShopReqData.key_person_name)
+        Timber.d("phone no=======> " + addShopReqData.phone_no)
+        Timber.d("additional dob=======> " + addShopReqData.addtional_dob)
+        Timber.d("additional doa=======> " + addShopReqData.addtional_doa)
+        Timber.d("doctor family member dob=======> " + addShopReqData.doc_family_member_dob)
+        Timber.d("specialization=======> " + addShopReqData.specialization)
+        Timber.d("average patient count per day=======> " + addShopReqData.average_patient_per_day)
+        Timber.d("category=======> " + addShopReqData.category)
+        Timber.d("doctor address=======> " + addShopReqData.doc_address)
+        Timber.d("doctor pincode=======> " + addShopReqData.doc_pincode)
+        Timber.d("chambers or hospital under same headquarter=======> " + addShopReqData.is_chamber_same_headquarter)
+        Timber.d("chamber related remarks=======> " + addShopReqData.is_chamber_same_headquarter_remarks)
+        Timber.d("chemist name=======> " + addShopReqData.chemist_name)
+        Timber.d("chemist name=======> " + addShopReqData.chemist_address)
+        Timber.d("chemist pincode=======> " + addShopReqData.chemist_pincode)
+        Timber.d("assistant name=======> " + addShopReqData.assistant_name)
+        Timber.d("assistant contact no=======> " + addShopReqData.assistant_contact_no)
+        Timber.d("assistant dob=======> " + addShopReqData.assistant_dob)
+        Timber.d("assistant date of anniversary=======> " + addShopReqData.assistant_doa)
+        Timber.d("assistant family dob=======> " + addShopReqData.assistant_family_dob)
+        Timber.d("doctor degree image path=======> $degreeImgLink")
+        Timber.d("entity id=======> " + addShopReqData.entity_id)
+        Timber.d("party status id=======> " + addShopReqData.party_status_id)
+        Timber.d("retailer id=======> " + addShopReqData.retailer_id)
+        Timber.d("dealer id=======> " + addShopReqData.dealer_id)
+        Timber.d("beat id=======> " + addShopReqData.beat_id)
+        Timber.d("assigned to shop id=======> " + addShopReqData.assigned_to_shop_id)
+        Timber.d("actual_address=======> " + addShopReqData.actual_address)
+        Timber.d("================================================")
 
         progress_wheel.spin()
 
@@ -5284,7 +5335,7 @@ class ShopDetailFragment : BaseFragment(), View.OnClickListener {
                             .subscribeOn(Schedulers.io())
                             .subscribe({ result ->
                                 val addShopResult = result as AddShopResponse
-                                XLog.d("Edit Shop : " + ", SHOP: " + addShopReqData.shop_name + ", RESPONSE:" + result.message)
+                                Timber.d("Edit Shop : " + ", SHOP: " + addShopReqData.shop_name + ", RESPONSE:" + result.message)
                                 when (addShopResult.status) {
                                     NetworkConstant.SUCCESS -> {
                                         AppDatabase.getDBInstance()!!.addShopEntryDao().updateIsEditUploaded(1, addShopReqData.shop_id)
@@ -5327,7 +5378,7 @@ class ShopDetailFragment : BaseFragment(), View.OnClickListener {
                             .subscribeOn(Schedulers.io())
                             .subscribe({ result ->
                                 val addShopResult = result as AddShopResponse
-                                XLog.d("Edit Shop : " + ", SHOP: " + addShopReqData.shop_name + ", RESPONSE:" + result.message)
+                                Timber.d("Edit Shop : " + ", SHOP: " + addShopReqData.shop_name + ", RESPONSE:" + result.message)
                                 when (addShopResult.status) {
                                     NetworkConstant.SUCCESS -> {
                                         AppDatabase.getDBInstance()!!.addShopEntryDao().updateIsEditUploaded(1, addShopReqData.shop_id)

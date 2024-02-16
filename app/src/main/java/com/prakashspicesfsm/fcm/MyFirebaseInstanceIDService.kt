@@ -8,7 +8,7 @@ import com.prakashspicesfsm.app.utils.AppUtils
 import com.prakashspicesfsm.base.BaseResponse
 import com.prakashspicesfsm.base.presentation.BaseActivity
 import com.prakashspicesfsm.fcm.api.UpdateDeviceTokenRepoProvider
-import com.elvishew.xlog.XLog
+
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.doAsync

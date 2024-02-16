@@ -37,11 +37,12 @@ import com.prakashspicesfsm.features.leaveapplynew.model.ApprovalRejectReqModel
 import com.prakashspicesfsm.features.leaveapplynew.model.clearAttendanceonRejectReqModelRejectReqModel
 import com.prakashspicesfsm.widgets.AppCustomEditText
 import com.prakashspicesfsm.widgets.AppCustomTextView
-import com.elvishew.xlog.XLog
+
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.json.JSONArray
 import org.json.JSONObject
+import timber.log.Timber
 import java.util.HashMap
 
 class ApprovalPendFrag: BaseFragment(), View.OnClickListener {
@@ -250,7 +251,7 @@ class ApprovalPendFrag: BaseFragment(), View.OnClickListener {
                                 }
 
                             }, { error ->
-                                XLog.d("Apply Leave Response ERROR=========> " + error.message)
+                                Timber.d("Apply Leave Response ERROR=========> " + error.message)
                                 BaseActivity.isApiInitiated = false
                                 progress_wheel.stopSpinning()
                                 (mContext as DashboardActivity).showSnackMessage(getString(R.string.something_went_wrong))
@@ -322,7 +323,7 @@ class ApprovalPendFrag: BaseFragment(), View.OnClickListener {
             @Throws(AuthFailureError::class)
             override fun getHeaders(): Map<String, String> {
                 val params: MutableMap<String, String> = HashMap()
-                params["Authorization"] = getString(R.string.firebase_key)
+                params["Authorization"] = getString(R.string.PART_1)+getString(R.string.PART_2)+getString(R.string.PART_3)+getString(R.string.PART_4)//getString(R.string.firebase_key)
                 params["Content-Type"] = "application/json"
                 return params
             }

@@ -44,7 +44,9 @@ import java.io.IOException
 import java.util.*
 import kotlin.collections.ArrayList
 
-
+// 1.0 DistributorwiseorderlistFragment AppV 4.0.6 saheli 20-01-2023 Pdf module updation mantis 25595
+// 2.0 DistributorwiseorderlistFragment AppV 4.0.6 saheli 20-01-2023 Pdf module updation mantis 25601
+// 3.0  DistributorwiseorderlistFragment App V 4.1.6 saheli 04-07-2023 0026504: Distributor wise order list click on assign party list app getting crash.
 class DistributorwiseorderlistFragment : BaseFragment(), View.OnClickListener {
     private lateinit var mContext: Context
     private lateinit var assign_to_tv: AppCustomTextView
@@ -148,9 +150,20 @@ class DistributorwiseorderlistFragment : BaseFragment(), View.OnClickListener {
                     return
                 }
                 var unuiqPPListObj :ArrayList<AssignToPPEntity> = ArrayList()
-                for(i in 0..unuiqPPList.size-1){
-                    unuiqPPListObj.add(AppDatabase.getDBInstance()?.ppListDao()?.getSingleValue(unuiqPPList.get(i).toString())!!)
-                }
+
+                    for(i in 0..unuiqPPList.size-1){
+                        // start rev 3.0  DistributorwiseorderlistFragment App V 4.1.6 saheli 04-07-2023 0026504: Distributor wise order list click on assign party list app getting crash.
+                        try {
+                            unuiqPPListObj.add(
+                                AppDatabase.getDBInstance()?.ppListDao()
+                                    ?.getSingleValue(unuiqPPList.get(i).toString())!!
+                            )
+                        }
+                        catch (ex:Exception){
+                            ex.printStackTrace()
+                        }
+                        //end rev 3.0  DistributorwiseorderlistFragment App V 4.1.6 saheli 04-07-2023 0026504: Distributor wise order list click on assign party list app getting crash.
+                    }
 
                 //var assignPPList = AppDatabase.getDBInstance()?.ppListDao()?.getAll()
                 var assignPPList = unuiqPPListObj
@@ -269,9 +282,12 @@ class DistributorwiseorderlistFragment : BaseFragment(), View.OnClickListener {
 
                    objOrderList.shop_id=AppDatabase.getDBInstance()!!.orderDetailsListDao().getSingleOrder(ordL.get(j).order_id.toString()).shop_id.toString()
                    var objShopDtls = AppDatabase.getDBInstance()?.addShopEntryDao()?.getShopByIdN(objOrderList.shop_id)!!
-                   objOrderList.shop_name = objShopDtls.shopName
-                   objOrderList.shop_addr = objShopDtls.address
-                   objOrderList.shop_ph = objShopDtls.ownerContactNumber
+                    objOrderList.shop_name = objShopDtls.shopName
+                    objOrderList.shop_addr = objShopDtls.address
+                    objOrderList.shop_ph = objShopDtls.ownerContactNumber
+                    // 2.0 NewOrderListFragment AppV 4.0.6 Pdf module updation mantis 25595
+                    objOrderList.shopOwner_PAN = objShopDtls.shopOwner_PAN
+                    objOrderList.gstN_Number = objShopDtls.gstN_Number
 
                    var objProductsL = AppDatabase.getDBInstance()!!.orderProductListDao().getDataAccordingToOrderId(objOrderList.ordNo)
                    for(k in 0..objProductsL.size-1){
@@ -281,6 +297,8 @@ class DistributorwiseorderlistFragment : BaseFragment(), View.OnClickListener {
                        productList.unit=objProductsL.get(k).watt.toString()
                        productList.rate=objProductsL.get(k).rate.toString()
                        productList.amt=objProductsL.get(k).total_price.toString()
+                       productList.order_mrp=objProductsL.get(k).order_mrp.toString()
+                       productList.order_discount=objProductsL.get(k).order_discount.toString()
                        objOrderList.productList.add(productList)
                    }
                }
@@ -298,9 +316,11 @@ class DistributorwiseorderlistFragment : BaseFragment(), View.OnClickListener {
 
 
     data class PdfDataRoot(var distName:String="",var  ordList:ArrayList<OrderList> = ArrayList())
+    // 2.0 NewOrderListFragment AppV 4.0.6 Pdf module updation mantis 25595
+    // 3.0 NewOrderListFragment AppV 4.0.6 Pdf module updation mantis 25601
     data class OrderList(var ordNo:String="",var ordDate:String="",var invNo:String="",var invDate:String="",var shop_id:String="",var shop_name:String="",
-                         var shop_addr:String="",var shop_ph:String="",var productList:ArrayList<ProductList> = ArrayList())
-    data class ProductList(var item_desc:String="",var qty:String="",var unit:String="",var rate:String="",var amt:String="")
+                         var shop_addr:String="",var shop_ph:String="",var shopOwner_PAN:String="",var gstN_Number:String="",var productList:ArrayList<ProductList> = ArrayList())
+    data class ProductList(var item_desc:String="",var qty:String="",var unit:String="",var rate:String="",var amt:String="",var order_mrp:String="",var order_discount:String="")
 
     private fun saveDataAsPdf(objData: PdfDataRoot){
         var document: Document = Document()
@@ -319,6 +339,7 @@ class DistributorwiseorderlistFragment : BaseFragment(), View.OnClickListener {
             document.open()
 
             var font: Font = Font(Font.FontFamily.HELVETICA, 10f, Font.BOLD)
+            var fontSmall: Font = Font(Font.FontFamily.HELVETICA, 9f, Font.BOLD)
             var fontBoldU: Font = Font(Font.FontFamily.HELVETICA, 12f, Font.UNDERLINE or Font.BOLD)
             var font1: Font = Font(Font.FontFamily.HELVETICA, 8f, Font.NORMAL)
             val redFront = Font(Font.FontFamily.HELVETICA, 12f, Font.UNDERLINE or Font.BOLD, BaseColor.BLUE)
@@ -406,6 +427,17 @@ class DistributorwiseorderlistFragment : BaseFragment(), View.OnClickListener {
                 Contact.spacingAfter = 2f
                 document.add(Contact)
 
+                // 2.0 NewOrderListFragment AppV 4.0.6 Pdf module updation mantis 25595
+                val PanNo = Paragraph("PAN                     :      " + if(objData.ordList.get(i).shopOwner_PAN==null) "" else objData.ordList.get(i).shopOwner_PAN, font1)
+                PanNo.alignment = Element.ALIGN_LEFT
+                PanNo.spacingAfter = 2f
+                document.add(PanNo)
+
+                val GSTNNo = Paragraph("GSTIN                  :      " + if(objData.ordList.get(i).gstN_Number==null) "" else objData.ordList.get(i).gstN_Number, font1)
+                GSTNNo.alignment = Element.ALIGN_LEFT
+                GSTNNo.spacingAfter = 2f
+                document.add(GSTNNo)
+
 
 
                 val xze = Paragraph("", font)
@@ -413,7 +445,21 @@ class DistributorwiseorderlistFragment : BaseFragment(), View.OnClickListener {
                 document.add(xze)
 
                 // table header
-                val widths = floatArrayOf(0.06f, 0.58f, 0.07f, 0.07f, 0.07f, 0.15f)
+//                val widths = floatArrayOf(0.06f, 0.58f, 0.07f, 0.07f, 0.07f, 0.15f)
+                // mantis 25601
+                var widths = floatArrayOf(0.06f, 0.36f, 0.07f, 0.07f, 0.07f, 0.15f,0.07f, 0.15f)
+                if(Pref.IsViewMRPInOrder && Pref.IsDiscountInOrder){
+                    widths = floatArrayOf(0.06f, 0.36f, 0.07f, 0.07f, 0.07f, 0.15f,0.07f, 0.15f)
+                }
+                else if(Pref.IsViewMRPInOrder) {
+                    widths = floatArrayOf(0.06f, 0.40f, 0.11f, 0.11f, 0.07f,0.10f,0.15f)
+                }
+                else if(Pref.IsDiscountInOrder) {
+                    widths = floatArrayOf(0.06f, 0.40f, 0.07f, 0.07f, 0.15f,0.10f, 0.15f)
+                }
+                else{
+                    widths = floatArrayOf(0.06f, 0.40f, 0.13f, 0.13f,0.13f, 0.15f)
+                }
 
                 var tableHeader: PdfPTable = PdfPTable(widths)
                 tableHeader.getDefaultCell().setHorizontalAlignment(Element.ALIGN_LEFT)
@@ -439,6 +485,21 @@ class DistributorwiseorderlistFragment : BaseFragment(), View.OnClickListener {
                 cell21.borderColor = BaseColor.GRAY
                 tableHeader.addCell(cell21);
 
+                // AppV 4.0.6  mantis 25601
+                if(Pref.IsViewMRPInOrder) {
+                    val cellMrp = PdfPCell(Phrase("MRP ", font))
+                    cellMrp.setHorizontalAlignment(Element.ALIGN_LEFT);
+                    cellMrp.borderColor = BaseColor.GRAY
+                    tableHeader.addCell(cellMrp);
+                }
+
+                if(Pref.IsDiscountInOrder) {
+                    val cellDiscount = PdfPCell(Phrase("Discount ", font))
+                    cellDiscount.setHorizontalAlignment(Element.ALIGN_LEFT);
+                    cellDiscount.borderColor = BaseColor.GRAY
+                    tableHeader.addCell(cellDiscount);
+                }
+
                 val cell3 = PdfPCell(Phrase("Rate ", font))
                 cell3.setHorizontalAlignment(Element.ALIGN_LEFT);
                 cell3.borderColor = BaseColor.GRAY
@@ -448,6 +509,8 @@ class DistributorwiseorderlistFragment : BaseFragment(), View.OnClickListener {
                 cell4.setHorizontalAlignment(Element.ALIGN_LEFT);
                 cell4.borderColor = BaseColor.GRAY
                 tableHeader.addCell(cell4);
+
+
 
                 document.add(tableHeader)
 
@@ -459,6 +522,9 @@ class DistributorwiseorderlistFragment : BaseFragment(), View.OnClickListener {
                 var unit: String = ""
                 var rate: String = ""
                 var amount: String = ""
+                // AppV 4.0.6  mantis 25601
+                var mrp: String = ""
+                var discount: String = ""
                 var tAmt="0"
                 var tempProductObj = objData.ordList.get(i).productList!!
                 for (j in 0..tempProductObj.size - 1) {
@@ -474,6 +540,16 @@ class DistributorwiseorderlistFragment : BaseFragment(), View.OnClickListener {
 
 
                     tAmt = (tAmt.toDouble()+tempProductObj.get(j).amt.toDouble()).toString()
+
+                    // AppV 4.0.6  mantis 25601
+                    try{
+                    mrp = getString(R.string.rupee_symbol_with_space)+" "+tempProductObj!!.get(i).order_mrp+" "
+                    discount = getString(R.string.rupee_symbol_with_space)+" "+tempProductObj!!.get(i).order_discount +" "
+                    }
+                    catch (ex:Exception){
+                        mrp = getString(R.string.rupee_symbol_with_space)+" "
+                        discount = getString(R.string.rupee_symbol_with_space)+" "
+                    }
 
                     val tableRows = PdfPTable(widths)
                     tableRows.defaultCell.horizontalAlignment = Element.ALIGN_CENTER
@@ -501,6 +577,21 @@ class DistributorwiseorderlistFragment : BaseFragment(), View.OnClickListener {
                     cellBody21.borderColor = BaseColor.GRAY
                     tableRows.addCell(cellBody21)
 
+                    // AppV 4.0.6  mantis 25601
+                    if(Pref.IsViewMRPInOrder){
+                        val cellMrp = PdfPCell(Phrase(mrp, font1))
+                        cellMrp.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        cellMrp.borderColor = BaseColor.GRAY
+                        tableRows.addCell(cellMrp);
+                    }
+
+                    if(Pref.IsDiscountInOrder){
+                        val cellDiscount = PdfPCell(Phrase(discount, font1))
+                        cellDiscount.setHorizontalAlignment(Element.ALIGN_LEFT);
+                        cellDiscount.borderColor = BaseColor.GRAY
+                        tableRows.addCell(cellDiscount);
+                    }
+
                     var cellBody3 = PdfPCell(Phrase(rate, font1))
                     cellBody3.setHorizontalAlignment(Element.ALIGN_LEFT)
                     cellBody3.borderColor = BaseColor.GRAY
@@ -523,7 +614,26 @@ class DistributorwiseorderlistFragment : BaseFragment(), View.OnClickListener {
                 val glue1 = Chunk(VerticalPositionMark())
                 val ph11 = Phrase()
                 val main1 = Paragraph()
-                ph11.add(Chunk("Rupees " + NumberToWords.numberToWord(tAmt.toDouble().toInt()!!)!!.toUpperCase() + " Only  ", font))
+
+                //new code begin
+                var intP = ""
+                var decPart = ""
+                var finalConcatWord = ""
+                tAmt = String.format("%.2f",tAmt.toDouble()) // 52.70
+                if(tAmt.contains(".")){
+                    intP = String.format("%.2f",tAmt.toDouble()).split(".").get(0).toString() //52
+                    decPart = String.format("%.2f",tAmt.toDouble()).split(".").get(1).toString() //70
+                    finalConcatWord = NumberToWords.numberToWord(intP.toDouble().toInt()!!)!!.toUpperCase()+" Rupees "+
+                            NumberToWords.numberToWord(decPart.toDouble().toInt()!!)!!.toUpperCase()+" Paisa"  //52 rupees 70 paisa
+                    if(NumberToWords.numberToWord(decPart.toDouble().toInt()!!)!!.toUpperCase().contains("ZERO")){
+                        ph11.add(Chunk( NumberToWords.numberToWord(intP.toDouble().toInt()!!)!!.toUpperCase() + " Only  ", fontSmall))
+                    }else{
+                        ph11.add(Chunk( finalConcatWord + " Only  ", fontSmall))
+                    }
+                }
+                //new code end
+
+                //ph11.add(Chunk("Rupees " + NumberToWords.numberToWord(tAmt.toDouble().toInt()!!)!!.toUpperCase() + " Only  ", font))
                 ph11.add(glue1) // Here I add special chunk to the same phrase.
 
                 ph11.add(Chunk("Total  Amount: " + "\u20B9" + tAmt.toString(), font))

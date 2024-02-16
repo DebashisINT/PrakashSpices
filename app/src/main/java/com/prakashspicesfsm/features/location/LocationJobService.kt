@@ -1,5 +1,6 @@
 package com.prakashspicesfsm.features.location
 
+import android.annotation.SuppressLint
 import android.app.job.JobInfo
 import android.app.job.JobParameters
 import android.app.job.JobScheduler
@@ -12,12 +13,14 @@ import android.os.Build
 import android.os.Bundle
 import androidx.annotation.RequiresApi
 import android.text.TextUtils
-import com.elvishew.xlog.XLog
+
 import com.prakashspicesfsm.app.Pref
 import com.prakashspicesfsm.app.utils.AppUtils
 import com.prakashspicesfsm.features.dashboard.presentation.SystemEventReceiver
+import timber.log.Timber
 
 
+@SuppressLint("SpecifyJobSchedulerIdRange")
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 /**
  * Created by riddhi on 7/11/17.
@@ -43,9 +46,10 @@ class LocationJobService : JobService() {
             return true
         }
 
-        XLog.d("=============================Start Job " + AppUtils.getCurrentDateTime() + "==============================")
+        Timber.d("=============================Start Job " + AppUtils.getCurrentDateTime() + "==============================")
 
         val myIntent = Intent(this, LocationFuzedService::class.java)
+        Timber.d("TAG_CHECK_LOC_SERVICE_STATUS")
 
         if (!TextUtils.isEmpty(updateFence)) {
             val bundle = Bundle()
@@ -71,7 +75,7 @@ class LocationJobService : JobService() {
     }
 
     override fun onStopJob(p0: JobParameters?): Boolean {
-        XLog.d("=========================Stop Job " + AppUtils.getCurrentDateTime() + "============================")
+        Timber.d("=========================Stop Job " + AppUtils.getCurrentDateTime() + "============================")
 
         //unregisterReceiver(eventReceiver)
 
@@ -86,12 +90,14 @@ class LocationJobService : JobService() {
                     .build()
 
             val jobScheduler = getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
+            Timber.d("TAG_CHECK_LOC_SERVICE_STATUS")
+
             val resultCode = jobScheduler.schedule(jobInfo)
 
             if (resultCode == JobScheduler.RESULT_SUCCESS) {
-                XLog.d("========================Job rescheduled (LocationJobService) " + AppUtils.getCurrentDateTime() + "==============================")
+                Timber.d("========================Job rescheduled (LocationJobService) " + AppUtils.getCurrentDateTime() + "==============================")
             } else {
-                XLog.d("========================Job not rescheduled (LocationJobService) " + AppUtils.getCurrentDateTime() + "==========================")
+                Timber.d("========================Job not rescheduled (LocationJobService) " + AppUtils.getCurrentDateTime() + "==========================")
             }
         }
 

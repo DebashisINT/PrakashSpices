@@ -19,20 +19,21 @@ import com.prakashspicesfsm.app.utils.AppUtils
 import com.prakashspicesfsm.app.utils.FTStorageUtils
 import com.prakashspicesfsm.features.location.LocationFuzedService
 import com.prakashspicesfsm.features.location.LocationJobService
-import com.elvishew.xlog.XLog
+import timber.log.Timber
+
 
 class WorkerService(context: Context,workParm:WorkerParameters):Worker(context,workParm) {
 
     override fun doWork(): Result {
         println("tag_ worker ${AppUtils.contx.toString()}")
-        XLog.d("Worker doWork")
+        Timber.d("Worker doWork")
         try{
             if(AppUtils.contx!=null){
                 if (!FTStorageUtils.isMyServiceRunning(LocationFuzedService::class.java, AppUtils.contx)) {
-                    XLog.d("Worker doWork LocationFuzedService called")
+                    Timber.d("Worker doWork LocationFuzedService called")
                     serviceStatusActionable()
                 }else{
-                    XLog.d("Worker doWork LocationFuzedService running")
+                    Timber.d("Worker doWork LocationFuzedService running")
                 }
             }
         }catch (ex:Exception){
@@ -53,8 +54,10 @@ class WorkerService(context: Context,workParm:WorkerParameters):Worker(context,w
                 return
             }
             val serviceLauncher = Intent(AppUtils.contx, LocationFuzedService::class.java)
+            Timber.d("TAG_CHECK_LOC_SERVICE_STATUS")
+
             if (Pref.user_id != null && Pref.user_id!!.isNotEmpty()) {
-                XLog.d("serviceStatusActionable")
+                Timber.d("serviceStatusActionable")
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     val jobScheduler = AppUtils.contx!!.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
                     val componentName = ComponentName(AppUtils.contx as Activity, LocationJobService::class.java)
@@ -68,19 +71,20 @@ class WorkerService(context: Context,workParm:WorkerParameters):Worker(context,w
                     val resultCode = jobScheduler.schedule(jobInfo)
 
                     if (resultCode == JobScheduler.RESULT_SUCCESS) {
-                        XLog.d("=============================== doWork serviceStatusActionable   Job scheduled  " + AppUtils.getCurrentDateTime() + "============================")
+                        Timber.d("=============================== doWork serviceStatusActionable   Job scheduled  " + AppUtils.getCurrentDateTime() + "============================")
                     } else {
-                        XLog.d("===================== doWork serviceStatusActionable Job not scheduled  " + AppUtils.getCurrentDateTime() + "====================================")
+                        Timber.d("===================== doWork serviceStatusActionable Job not scheduled  " + AppUtils.getCurrentDateTime() + "====================================")
                     }
                 } else
-                    AppUtils.contx!!.startService(serviceLauncher)
+                    Timber.d("TAG_CHECK_LOC_SERVICE_STATUS")
+                AppUtils.contx!!.startService(serviceLauncher)
             } else {
                 AppUtils.contx!!.stopService(serviceLauncher)
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     val jobScheduler = AppUtils.contx!!.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
                     jobScheduler.cancelAll()
-                    XLog.d("===============================Worker Job scheduler cancel (Base Activity)" + AppUtils.getCurrentDateTime() + "============================")
+                    Timber.d("===============================Worker Job scheduler cancel (Base Activity)" + AppUtils.getCurrentDateTime() + "============================")
 
                     /*if (AppUtils.mGoogleAPIClient != null) {
                         AppUtils.mGoogleAPIClient?.disconnect()
@@ -92,7 +96,7 @@ class WorkerService(context: Context,workParm:WorkerParameters):Worker(context,w
             notificationManager.cancelAll()*/
 
                 AlarmReceiver.stopServiceAlarm(AppUtils.contx as Activity, 123)
-                XLog.d("===========Worker Service alarm is stopped (Base Activity)================")
+                Timber.d("===========Worker Service alarm is stopped (Base Activity)================")
             }
         } catch (e: Exception) {
             e.printStackTrace()

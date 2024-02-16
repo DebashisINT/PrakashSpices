@@ -18,7 +18,7 @@ import com.prakashspicesfsm.features.dashboard.presentation.DashboardActivity
 import com.prakashspicesfsm.features.document.api.DocumentRepoProvider
 import com.prakashspicesfsm.features.document.model.DocumentTypeResponseModel
 import com.prakashspicesfsm.widgets.AppCustomTextView
-import com.elvishew.xlog.XLog
+
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import org.jetbrains.anko.doAsync

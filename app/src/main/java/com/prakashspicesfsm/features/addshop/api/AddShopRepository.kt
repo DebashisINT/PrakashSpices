@@ -11,7 +11,14 @@ import com.prakashspicesfsm.base.BaseResponse
 import com.prakashspicesfsm.features.addshop.model.*
 import com.prakashspicesfsm.features.addshop.model.assigntopplist.AddShopUploadImg
 import com.prakashspicesfsm.features.addshop.model.assigntopplist.AddshopImageMultiReqbody1
+import com.prakashspicesfsm.features.addshop.presentation.ShopListSubmitResponse
+import com.prakashspicesfsm.features.addshop.presentation.multiContactRequestData
+import com.prakashspicesfsm.features.beatCustom.BeatGetStatusModel
 import com.prakashspicesfsm.features.dashboard.presentation.DashboardActivity
+import com.prakashspicesfsm.features.nearbyshops.presentation.ShopModifiedListResponse
+import com.prakashspicesfsm.features.nearbyshops.presentation.ShopModifiedUpdateList
+import com.prakashspicesfsm.features.stockAddCurrentStock.model.AddstockImageMultiReqbody1
+import com.prakashspicesfsm.features.taskManagement.PriorityTaskSel
 import com.google.gson.Gson
 import io.reactivex.Observable
 import okhttp3.MediaType
@@ -22,6 +29,9 @@ import java.io.File
 /**
  * Created by Pratishruti on 22-11-2017.
  */
+// Revision History
+// 1.0 AddShopRepository saheli v 4.0.8 15-05-2023 mantis 26103
+// 2.0 AddShopRepository rev mantis 26121 saheli v 4.0.8 15-05-2023
 class AddShopRepository(val apiService: AddShopApi) {
 
     fun addQues(questionSubmit: AddQuestionSubmitRequestData): Observable<BaseResponse> {
@@ -36,10 +46,40 @@ class AddShopRepository(val apiService: AddShopApi) {
         return apiService.getAddShop(shop)
     }
 
+    // 2.0 NearByShopsListFragment AppV 4.0.6   Contact Multi Api called Add & Update
+    fun addMutiContact(multiContact: multiContactRequestData): Observable<BaseResponse> {
+        return apiService.getMutiContact(multiContact)
+    }
+    fun updateMutiContact(multiContact: multiContactRequestData): Observable<BaseResponse> {
+        return apiService.updateMutiContact(multiContact)
+    }
+
+    fun fetchMultiContactData(user_id: String,session_token: String): Observable<ShopListSubmitResponse>{
+        return apiService.fetchMultiContactData(user_id,session_token)
+    }
+
     fun fetchData(shop_id:String): Observable<imageListResponse> {
         return apiService.geimagelist(shop_id,Pref.user_id!!,Pref.session_token!!)
     }
+    // start 1.0 rev mantis 26013 saheli v 4.0.8 15-05-2023
+    fun getStockwiseimagelist(stock_id:String): Observable<ImagestockwiseListResponse> {
+        return apiService.getStockWiseimagelist(stock_id,Pref.user_id!!,Pref.session_token!!)
+    }
 
+    // end 1.0 rev mantis 26013 saheli v 4.0.8 15-05-2023
+    // start 2.0 rev mantis 26121 saheli v 4.0.8 15-05-2023
+    fun fetchPriorityData(session_token: String): Observable<PriorityTaskSel>{
+        return apiService.fetchpriorityData(session_token)
+    }
+    // end 2.0 rev mantis 26121 saheli v 4.0.8 15-05-2023
+    // 5.0 NearByShopsListFragment AppV 4.0.6 Suman 03-02-2023 updateModifiedShop + sendModifiedShopList  for shop update mantis 25624
+    fun checkModifiedShopList(): Observable<ShopModifiedListResponse> {
+        return apiService.getModifiedShopList(Pref.user_id!!,Pref.session_token!!)
+    }
+    // 5.0 NearByShopsListFragment AppV 4.0.6 Suman 03-02-2023 updateModifiedShop + sendModifiedShopList  for shop update mantis 25624
+    fun updateModifiedShopList(obj : ShopModifiedUpdateList): Observable<BaseResponse> {
+        return apiService.getModifiedShopListApi(obj)
+    }
     fun addShopWithImage(shop: AddShopRequestData, shop_image: String, context: Context): Observable<AddShopResponse> {
         var profile_img_data: MultipartBody.Part? = null
 
@@ -387,6 +427,49 @@ class AddShopRepository(val apiService: AddShopApi) {
 
         return  apiService.UploadAttachImage4(jsonInString, profile_img_data)
     }
+
+    // start 1.0 AddShopRepository rev mantis 26013 saheli v 4.0.8 15-05-2023
+
+    fun addStockWithImageuploadMultipleImg1(image: AddstockImageMultiReqbody1, upload_image: String?, context: Context): Observable<BaseResponse> {
+        var profile_img_data: MultipartBody.Part? = null
+        val profile_img_file = File(upload_image)
+        val profileImgBody = RequestBody.create(MediaType.parse("multipart/form-data"), profile_img_file)
+        val fileExt = File(upload_image).extension
+        val imageName = "name_1"
+        val fileName = imageName + "img_" + System.currentTimeMillis() + "." + fileExt
+        profile_img_data = MultipartBody.Part.createFormData("attachment_stock_image1", fileName, profileImgBody)
+
+        var jsonInString = ""
+        try {
+            jsonInString = Gson().toJson(image)
+        } catch (e: Throwable) {
+            e.printStackTrace()
+        }
+
+        return  apiService.UploadStockAttachImage1(jsonInString, profile_img_data)
+    }
+    fun addStockWithImageuploadMultipleImg2(image: AddstockImageMultiReqbody1, upload_image: String?, context: Context): Observable<BaseResponse> {
+        var profile_img_data: MultipartBody.Part? = null
+        val profile_img_file = File(upload_image)
+        val profileImgBody = RequestBody.create(MediaType.parse("multipart/form-data"), profile_img_file)
+        val fileExt = File(upload_image).extension
+        val imageName = "name_1"
+        val fileName = imageName + "img_" + System.currentTimeMillis() + "." + fileExt
+        profile_img_data = MultipartBody.Part.createFormData("attachment_stock_image2", fileName, profileImgBody)
+
+        var jsonInString = ""
+        try {
+            jsonInString = Gson().toJson(image)
+        } catch (e: Throwable) {
+            e.printStackTrace()
+        }
+
+        return  apiService.UploadStockAttachImage2(jsonInString, profile_img_data)
+    }
+
+
+
+    // end 1.0 rev AddShopRepository mantis 26013 saheli v 4.0.8 15-05-2023
 
 
 

@@ -5,6 +5,25 @@ import com.marcinmoskala.kotlinpreferences.PreferenceHolder
 /**
  * Created by Pratishruti on 08-11-2017.
  */
+// Revision History
+// 1.0 Pref  AppV 4.0.6 Saheli    16/01/2023 Update beat feature
+// 2.0 Pref  AppV 4.0.6 Saheli    25/01/2023 mantis 25623
+// 3.0 Pref  AppV 4.0.7 Suman    10/03/2023 Pdf generation settings wise  mantis 25650
+// 4.0 Pref  AppV 4.0.7 Suman    23/03/2023 ShowApproxDistanceInNearbyShopList Show approx distance in nearby + shopmaster  mantis 0025742
+// 5.0 Pref  AppV 4.0.8 Saheli   06/04/2023 mantis 0025780 IsAssignedDDAvailableForAllUser Useds LoginActivity If this feature 'On' then Assigned DD [Assigned DD Table] shall be available in 'Shop Master'
+// Rev 6.0 Pref AppV 4.0.8 Suman    26/04/2023 mail repetation fix 25923
+// Rev 7.0 Pref AppV 4.0.8 Suman    02/05/2023 mantis id 25979
+//Rev 8.0 Pref AppV 4.0.8 Saheli    05/05/2023  mantis 0026023
+// Rev 9.0 Pref AppV 4.0.8 Saheli    12/05/2023  mantis 0026101
+// Rev 10.0 Pref AppV 4.0.8 Suman    16/05/2023  mantis 26119
+// Rev 11.0 Pref AppV 4.0.8 Suman    19/05/2023  mantis 26163
+// 12.0 Pref v 4.1.6 Tufan 11/07/2023 mantis 26546 revisit sync time
+// 13.0 Pref v 4.1.6 Suman 13/07/2023 mantis 26555 Usersettings
+// 14.0 Pref v 4.1.6 Tufan 11/08/2023 mantis 26655 Order Past Days
+// 15.0 Pref v 4.1.6 Tufan 22/08/2023 mantis 26649 Show distributor scheme with Product
+// 16.0 Pref v 4.1.6 Tufan 07/09/2023 mantis 26785 Multi visit Interval in Minutes Against the Same Shop
+//Begin 16.0 Pref v 4.1.6 Tufan 21/09/2023 mantis 26812 AND 26813  FSSAI Lic No and GSTINPANMandatoryforSHOPTYPE4 In add shop page edit
+
 object Pref : PreferenceHolder() {
     var text: String? by bindToPreferenceFieldNullable()
     var num: Int by bindToPreferenceField(0, "SomeIntKey")
@@ -34,6 +53,7 @@ object Pref : PreferenceHolder() {
     var isLocationActivitySynced: Boolean by bindToPreferenceField(true, "isLocationActivitySynced")
     var prevShopActivityTimeStamp: Long by bindToPreferenceField(0, "prevTimeStamp")
     var prevLocationActivityTimeStamp: Long by bindToPreferenceField(0, "prevLocTimeStamp")
+    var shouldCallHisSync: Long by bindToPreferenceField(0, "shouldCallHisSync")
     var prevIdealLocationActivityTimeStamp: Long by bindToPreferenceField(
         0,
         "prevIdealLocTimeStamp"
@@ -66,6 +86,8 @@ object Pref : PreferenceHolder() {
     var isMarketingImgSynched: Boolean by bindToPreferenceField(false, "isMarketingImgSynched")
     var current_latitude: String by bindToPreferenceField("", "current_latitude")
     var current_longitude: String by bindToPreferenceField("", "current_longitude")
+    var current_address: String by bindToPreferenceField("", "current_address")
+    var current_pincode: String by bindToPreferenceField("", "current_pincode")
     var isAddAttendence: Boolean by bindToPreferenceField(false, "isAddAttendence")
     var gpsAccuracy: String by bindToPreferenceField("100", "gpsAccuracy")
     var source_latitude: String by bindToPreferenceField("", "source_latitude")
@@ -681,7 +703,7 @@ object Pref : PreferenceHolder() {
     )
     var ShopScreenAftVisitRevisitGlobal: Boolean by bindToPreferenceField(
         true,
-        "ShopScreenAftVisitRevisit"
+        "ShopScreenAftVisitRevisitGlobal"
     )
 
     var NotiCountFlag: Boolean by bindToPreferenceField(false, "NotiCountFlag")
@@ -696,7 +718,7 @@ object Pref : PreferenceHolder() {
     var IsAllowBreakageTracking: Boolean by bindToPreferenceField(false, "IsAllowBreakageTracking")
     var IsAllowBreakageTrackingunderTeam: Boolean by bindToPreferenceField(
         false,
-        "IsFeedbackAvailableInShop"
+        "IsAllowBreakageTrackingunderTeam"
     )
 
     var IsRateEnabledforNewOrderScreenwithSize: Boolean by bindToPreferenceField(
@@ -790,10 +812,7 @@ object Pref : PreferenceHolder() {
     var IsShowNewOrderCart: Boolean by bindToPreferenceField(false, "IsShowNewOrderCart")
     var IsLoginSelfieRequired: Boolean by bindToPreferenceField(false, "IsLoginSelfieRequired")
 
-    var IsmanualInOutTimeRequired: Boolean by bindToPreferenceField(
-        false,
-        "IsmanualInOutTimeRequired"
-    )
+    var IsmanualInOutTimeRequired: Boolean by bindToPreferenceField(false, "IsmanualInOutTimeRequired")
     var surveytext: String by bindToPreferenceField("survey", "surveytext")
 
     var IsDiscountInOrder: Boolean by bindToPreferenceField(false, "IsDiscountInOrder")
@@ -802,11 +821,197 @@ object Pref : PreferenceHolder() {
 
     var IsJointVisitEnable:Boolean by bindToPreferenceField(false, "IsJointVisitEnable")
     var IsShowAllEmployeeforJointVisit:Boolean by bindToPreferenceField(false, "IsShowAllEmployeeforJointVisit")
+    var JointVisitSelectedUserName:String by bindToPreferenceField("", "JointVisitSelectedUserName")
 
     var IsShowStateInTeam: Boolean by bindToPreferenceField(false, "IsShowStateInTeam")
     var IsShowBranchInTeam: Boolean by bindToPreferenceField(false, "IsShowBranchInTeam")
     var IsShowDesignationInTeam: Boolean by bindToPreferenceField(false, "IsShowDesignationInTeam")
 
+    var IsAllowClickForVisit: Boolean by bindToPreferenceField(false, "IsAllowClickForVisit")
+    var IsShowInPortalManualPhotoRegn: Boolean by bindToPreferenceField(false, "IsShowInPortalManualPhotoRegn")
+    var IsShowTypeInRegistration: Boolean by bindToPreferenceField(false, "IsShowTypeInRegistration")
+    var UpdateUserName: Boolean by bindToPreferenceField(false, "UpdateUserName")
+    var IsAllowClickForPhotoRegister: Boolean by bindToPreferenceField(false, "IsAllowClickForPhotoRegister")
+    var ShowAutoRevisitInAppMenu: Boolean by bindToPreferenceField(false, "ShowAutoRevisitInAppMenu")// 1.0  AppV 4.0.6
+    var OfflineShopAccuracy: String by bindToPreferenceField("700", "OfflineShopAccuracy")// 1.0  AppV 4.0.6
 
+    var IsFaceRecognitionOnEyeblink: Boolean by bindToPreferenceField(false, "IsFaceRecognitionOnEyeblink")
+    var PartyUpdateAddrMandatory: Boolean by bindToPreferenceField(false, "PartyUpdateAddrMandatory") // 2.0 AppV 4.0.6
+
+    var IsAttendVisitShowInDashboardGlobal: Boolean by bindToPreferenceField(false, "IsAttendVisitShowInDashboardGlobal") // 2.0 DashboardFragment  AppV 4.0.6
+    var IsAttendVisitShowInDashboard: Boolean by bindToPreferenceField(false, "IsAttendVisitShowInDashboard") // 2.0 DashboardFragment  AppV 4.0.6
+    var CommonAINotification: Boolean by bindToPreferenceField(false, "CommonAINotification")// 1.0  AppV 4.0.6 LocationFuzedService
+    var IsIMEICheck: Boolean by bindToPreferenceField(false, "IsIMEICheck")//1.0 LoginActivity  AppV 4.0.6
+
+    var Show_App_Logout_Notification_Global: Boolean by bindToPreferenceField(false, "Show_App_Logout_Notification_Global")//2.0 LocationFuzedService  AppV 4.0.6
+    var Show_App_Logout_Notification: Boolean by bindToPreferenceField(false, "Show_App_Logout_Notification")//2.0 LocationFuzedService  AppV 4.0.6
+    var AllowProfileUpdate: Boolean by bindToPreferenceField(false, "AllowProfileUpdate")// 1.0 MyProfileFragment  AppV 4.0.6
+    var ShowAutoRevisitInDashboard: Boolean by bindToPreferenceField(false, "ShowAutoRevisitInDashboard")
+    var ShowTotalVisitAppMenu: Boolean by bindToPreferenceField(false, "ShowTotalVisitAppMenu")// 3.0  AppV 4.0.6  DashboardActivity
+
+    var IsMultipleContactEnableforShop: Boolean by bindToPreferenceField(false, "IsMultipleContactEnableforShop")
+    var IsContactPersonSelectionRequiredinRevisit: Boolean by bindToPreferenceField(false, "IsContactPersonSelectionRequiredinRevisit")
+    var IsContactPersonRequiredinQuotation: Boolean by bindToPreferenceField(false, "IsContactPersonRequiredinQuotation")// 4.0  AppV 4.0.6  DashboardFragment Addquot work
+    var IsAllowShopStatusUpdate: Boolean by bindToPreferenceField(false, "IsAllowShopStatusUpdate")//2.0 NearByShopsListAdapter  AppV 4.0.6 IsAllowShopStatusUpdate
+    var IsShowBeatInMenu:Boolean by bindToPreferenceField(false, "IsShowBeatInMenu")//userwise 1.0 Pref  AppV 4.0.6 Update beat feature
+    var IsBeatAvailable :Boolean by bindToPreferenceField(false, "IsBeatAvailable")// global 1.0 Pref  AppV 4.0.6 Update beat feature
+
+    var isExpenseFeatureAvailable :Boolean by bindToPreferenceField(false, "isExpenseFeatureAvailable")//mantis 25607
+
+    var IsDiscountEditableInOrder: Boolean by bindToPreferenceField(false, "IsDiscountEditableInOrder")//mantis 25623
+
+    var IsRouteStartFromAttendance: Boolean by bindToPreferenceField(false, "IsRouteStartFromAttendance")//mantis 25637
+
+    var IsShowQuotationFooterforEurobond: Boolean by bindToPreferenceField(false, "IsShowQuotationFooterforEurobond")// 3.0 Pref  AppV 4.0.7 Suman    10/03/2023 Pdf generation settings wise  mantis 25650
+    var IsShowOtherInfoinShopMaster: Boolean by bindToPreferenceField(false, "IsShowOtherInfoinShopMaster") // 3.0 Pref  AppV 4.0.7 Suman    10/03/2023 Pdf generation settings wise  mantis 25650
+
+    var IsVoiceEnable: Boolean by bindToPreferenceField(true, "IsVoiceEnable")
+
+    var IsAllowZeroRateOrder: Boolean by bindToPreferenceField(false, "IsAllowZeroRateOrder")
+
+    // 4.0 Pref  AppV 4.0.7 Suman    23/03/2023 ShowApproxDistanceInNearbyShopList Show approx distance in nearby + shopmaster  mantis 0025742
+    var ShowApproxDistanceInNearbyShopList: Boolean by bindToPreferenceField(false, "ShowApproxDistanceInNearbyShopList")
+
+    // 5.0 Pref  AppV 4.0.8 Saheli    06/04/2023 mantis 0025780 IsAssignedDDAvailableForAllUser Useds LoginActivity If this feature 'On' then Assigned DD [Assigned DD Table] shall be available in 'Shop Master'
+    var IsAssignedDDAvailableForAllUserGlobal: Boolean by bindToPreferenceField(false, "IsAssignedDDAvailableForAllUser ")
+    var IsAssignedDDAvailableForAllUser : Boolean by bindToPreferenceField(false, "IsAssignedDDAvailableForAllUser ")
+
+    //Begin Rev 17 DashboardActivity AppV 4.0.8 Suman    24/04/2023 distanct+station calculation 25806
+    var profile_latitude: String by bindToPreferenceField("", "profile_latitude")
+    var profile_longitude: String by bindToPreferenceField("", "profile_longitude")
+    //End of Rev 17 DashboardActivity AppV 4.0.8 Suman    24/04/2023 distanct+station calculation 25806
+
+    // 6.0 Pref  AppV 4.0.8 Saheli    20/04/2023 mantis 25860
+    var IsShowEmployeePerformanceGlobal: Boolean by bindToPreferenceField(false, "IsShowEmployeePerformance")
+    var IsShowEmployeePerformance : Boolean by bindToPreferenceField(false, "IsShowEmployeePerformance")
+
+    //Begin Rev 6.0 Pref AppV 4.0.8 Suman    26/04/2023 mail repetation fix 25923
+    var prevQutoNoForMail : String by bindToPreferenceField("", "prevQutoNoForMail")
+    //End Rev 6.0 Pref AppV 4.0.8 Suman    26/04/2023 mail repetation fix 25923
+
+    //Begin Rev 7.0 Pref AppV 4.0.8 Suman    02/05/2023 mantis id 25979
+    var IsAttendanceCheckedforExpense : Boolean by bindToPreferenceField(false, "IsAttendanceCheckedforExpense")
+    var IsShowLocalinExpense : Boolean by bindToPreferenceField(false, "IsShowLocalinExpense")
+    var IsShowOutStationinExpense : Boolean by bindToPreferenceField(false, "IsShowOutStationinExpense")
+    var IsSingleDayTAApplyRestriction : Boolean by bindToPreferenceField(false, "IsSingleDayTAApplyRestriction")
+    var IsTAAttachment1Mandatory : Boolean by bindToPreferenceField(false, "IsTAAttachment1Mandatory")
+    var IsTAAttachment2Mandatory : Boolean by bindToPreferenceField(false, "IsTAAttachment2Mandatory")
+
+    var NameforConveyanceAttachment1 : String by bindToPreferenceField("", "NameforConveyanceAttachment1")
+    var NameforConveyanceAttachment2 : String by bindToPreferenceField("", "NameforConveyanceAttachment2")
+
+    //End of Rev 7.0 Pref AppV 4.0.8 Suman    02/05/2023 mantis id 25979
+
+    //Begin Rev 8.0 Pref AppV 4.0.8 Saheli    05/05/2023  mantis 0026023
+    var IsTaskManagementAvailable: Boolean by bindToPreferenceField(false, "IsTaskManagementAvailable")
+    //end Rev 8.0 Pref AppV 4.0.8 Saheli    05/05/2023  mantis 0026023
+
+    var IsShowPrivacyPolicyInMenu: Boolean by bindToPreferenceField(false, "IsShowPrivacyPolicyInMenu")
+
+    //Begin Rev 9.0 Pref AppV 4.0.8 Saheli    12/05/2023  mantis 0026101
+    var IsAttachmentAvailableForCurrentStock : Boolean by bindToPreferenceField(false, "IsAttachmentAvailableForCurrentStock")
+    //end Rev 9.0 Pref AppV 4.0.8 Saheli    12/05/2023  mantis 0026101
+
+    //Begin Rev 10.0 Pref AppV 4.0.8 Suman    16/05/2023  mantis 26119
+    var IsShowReimbursementTypeInAttendance : Boolean by bindToPreferenceField(false, "IsShowReimbursementTypeInAttendance")
+    var selectedVisitStationID : String by bindToPreferenceField("", "selectedVisitStationID")
+    var selectedVisitStationName : String by bindToPreferenceField("", "selectedVisitStationName")
+    //End of Rev 10.0 Pref AppV 4.0.8 Suman    16/05/2023  mantis 26119
+
+    //Begin Rev 11.0 Pref AppV 4.0.8 Suman    19/05/2023  mantis 26163
+    var IsBeatPlanAvailable : Boolean by bindToPreferenceField(false, "IsBeatPlanAvailable")
+    //End of Rev 11.0 Pref AppV 4.0.8 Suman    19/05/2023  mantis 26163
+
+    var IsMenuShowAIMarketAssistant : Boolean by bindToPreferenceField(false, "IsMenuShowAIMarketAssistant")
+
+    var IsUpdateVisitDataInTodayTable : Boolean by bindToPreferenceField(false, "IsUpdateVisitDataInTodayTable")
+
+    //Begin Rev 12.0 Pref AppV 4.1.6 Saheli    20/06/2023  mantis 0026391
+    var isNewOptimizedStock : Boolean by bindToPreferenceField(true, "isNewOptimizedStock")
+    var savefromOrderOrStock : Boolean by bindToPreferenceField(true, "savefromOrderOrStock")
+    //end Rev 12.0 Pref AppV 4.1.6 Saheli    20/06/2023  mantis 0026391
+
+    //Begin 12.0 Pref v 4.1.6 Tufan 11/07/2023 mantis 26546 revisit sync time
+    var ShopSyncIntervalInMinutes: String by bindToPreferenceField("10", "ShopSyncIntervalInMinutes")
+    //End 12.0 Pref v 4.1.6 Tufan 11/07/2023 mantis 26546 revisit sync time
+
+    //Begin 13.0 Pref v 4.1.6 Suman 13/07/2023 mantis 26555 Usersettings
+    var IsUsbDebuggingRestricted : Boolean by bindToPreferenceField(false, "IsUsbDebuggingRestricted")
+    //End 13.0 Pref v 4.1.6 Suman 13/07/2023 mantis 26555 Usersettings
+
+    var IsShowWhatsAppIconforVisit : Boolean by bindToPreferenceField(false, "IsShowWhatsAppIconforVisit")
+    var IsAutomatedWhatsAppSendforRevisit : Boolean by bindToPreferenceField(false, "IsAutomatedWhatsAppSendforRevisit")
+
+    var UserLoginContactID : String by bindToPreferenceField("", "UserLoginContactID")
+
+    //Begin 14.0 Pref v 4.1.6 Tufan 11/08/2023 mantis 26655 Order Past Days
+    var Order_Past_Days: String by bindToPreferenceField("10", "Order_Past_Days")
+    var IsAllowBackdatedOrderEntry : Boolean by bindToPreferenceField(false, "IsAllowBackdatedOrderEntry")
+  //End 14.0 Pref v 4.1.6 Tufan 11/08/2023 mantis 26655 Order Past Days
+
+    //Begin 15.0 Pref v 4.1.6 Tufan 22/08/2023 mantis 26649 Show distributor scheme with Product
+  var Show_distributor_scheme_with_Product : Boolean by bindToPreferenceField(false, "Show_distributor_scheme_with_Product")
+    //end 15.0 Pref v 4.1.6 Tufan 22/08/2023 mantis 26649 Show distributor scheme with Product
+
+   //Begin 16.0 Pref v 4.1.6 Tufan 07/09/2023 mantis 26785 Multi visit Interval in Minutes Against the Same Shop
+   var MultiVisitIntervalInMinutes : String by bindToPreferenceField("1", "MultiVisitIntervalInMinutes")
+    //End 16.0 Pref v 4.1.6 Tufan 07/09/2023 mantis 26785 Multi visit Interval in Minutes Against the Same Shop
+
+
+    //Begin 16.0 Pref v 4.1.6 Tufan 21/09/2023 mantis 26812 AND 26813  FSSAI Lic No and GSTINPANMandatoryforSHOPTYPE4 In add shop page edit
+    var GSTINPANMandatoryforSHOPTYPE4: Boolean by bindToPreferenceField(
+        false,
+        "GSTINPANMandatoryforSHOPTYPE4"
+    )
+    var FSSAILicNoEnableInShop: Boolean by bindToPreferenceField(
+        false,
+        "FSSAILicNoEnableInShop"
+    )
+    var FSSAILicNoMandatoryInShop4: Boolean by bindToPreferenceField(
+        false,
+        "FSSAILicNoMandatoryInShop4"
+    )
+    //end 16.0 Pref v 4.1.6 Tufan 21/09/2023 mantis 26812 AND 26813  FSSAI Lic No and GSTINPANMandatoryforSHOPTYPE4 In add shop page edit
+
+    var IsDisabledUpdateAddress: Boolean by bindToPreferenceField(false, "IsDisabledUpdateAddress")
+
+    var IsAutoLogoutFromBatteryCheck: Boolean by bindToPreferenceField(false, "IsAutoLogoutFromBatteryCheck")
+    var IsLoggedIn: Boolean by bindToPreferenceField(false, "IsLoggedIn")
+    var IsAnyPageVisitFromDshboard: Boolean by bindToPreferenceField(false, "IsAnyPageVisitFromDshboard")
+
+    //Begin Puja 16.11.23 mantis-0026997 //
+
+    var isLeadContactNumber: Boolean by bindToPreferenceField(false, "isLeadContactNumber")
+    var isModelEnable: Boolean by bindToPreferenceField(false, "isModelEnable")
+    var isPrimaryApplicationEnable: Boolean by bindToPreferenceField(false, "isPrimaryApplicationEnable")
+    var isSecondaryApplicationEnable: Boolean by bindToPreferenceField(false, "isSecondaryApplicationEnable")
+    var isBookingAmount: Boolean by bindToPreferenceField(false, "isBookingAmount")
+    var isLeadTypeEnable: Boolean by bindToPreferenceField(false, "isLeadTypeEnable")
+    var isStageEnable: Boolean by bindToPreferenceField(false, "isStageEnable")
+    var isFunnelStageEnable: Boolean by bindToPreferenceField(false, "isFunnelStageEnable")
+
+    //End puja 16.11.23 mantis-0026997 //
+
+    var IsShowMenuCRMContacts: Boolean by bindToPreferenceField(false, "IsShowMenuCRMContacts")
+
+    //mantis id 27063 Suman 04-12-2023
+    var IsCallLogHistoryActivated: Boolean by bindToPreferenceField(false, "IsCallLogHistoryActivated")
+
+    var IsGPSRouteSync: Boolean by bindToPreferenceField(true, "IsGPSRouteSync")
+
+    var IsSyncBellNotificationInApp: Boolean by bindToPreferenceField(true, "IsSyncBellNotificationInApp")
+    var IsShowCustomerLocationShare: Boolean by bindToPreferenceField(true, "IsShowCustomerLocationShare")
+    var scheduler_template: String? by bindToPreferenceFieldNullable()
+    var scheduler_file: String? by bindToPreferenceFieldNullable()
+    var storeGmailId: String? by bindToPreferenceFieldNullable()
+    var storeGmailPassword: String? by bindToPreferenceFieldNullable()
+    var minAccuracy: String by bindToPreferenceField("200", "minAccuracy")
+    var isAutoMailProceeding: Boolean by bindToPreferenceField(false, "isAutoMailProceeding")
+
+    var isTemplateDialogAlertShow: Boolean by bindToPreferenceField(true, "isTemplateDialogAlertShow")
+    var logId: String by bindToPreferenceField("", "logId")
+    var loginPassword: String by bindToPreferenceField("", "loginPassword")
 
 }
+
+

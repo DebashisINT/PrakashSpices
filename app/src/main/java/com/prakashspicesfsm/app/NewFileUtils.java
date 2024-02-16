@@ -2,6 +2,7 @@ package com.prakashspicesfsm.app;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
@@ -13,8 +14,14 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
+
+import androidx.documentfile.provider.DocumentFile;
 import androidx.loader.content.CursorLoader;
 import android.webkit.MimeTypeMap;
+
+import com.prakashspicesfsm.features.dashboard.presentation.DashboardActivity;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -25,6 +32,7 @@ import java.io.InputStream;
 /**
  * Created by Saikat on 25-11-2019.
  */
+// Rev 1.0 NewFileUtils AppV 4.0.8 saheli    12/05/2023 mantis 26101
 public class NewFileUtils {
 
     private static String mimeType = "";
@@ -235,8 +243,8 @@ public class NewFileUtils {
         return result;
     }
 
-    public static String getDataColumn(Context context, Uri uri, String selection,
-                                       String[] selectionArgs) {
+    private static String getDataColumn(Context context, Uri uri, String selection,
+                                        String[] selectionArgs) {
 
         Cursor cursor = null;
         final String column = "_data";
@@ -248,8 +256,8 @@ public class NewFileUtils {
             cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
                     null);
             if (cursor != null && cursor.moveToFirst()) {
-                final int index = cursor.getColumnIndexOrThrow(column);
-                return cursor.getString(index);
+                final int column_index = cursor.getColumnIndexOrThrow(column);
+                return cursor.getString(column_index);
             }
         } finally {
             if (cursor != null)
@@ -257,7 +265,6 @@ public class NewFileUtils {
         }
         return null;
     }
-
 
     public static String getFilePath(Context context, Uri uri) {
 
@@ -412,4 +419,64 @@ public class NewFileUtils {
         }
         context.startActivityForResult(Intent.createChooser(intent, "ChooseFile"), requestCode);
     }
+
+    // rev NewFileUtils start 1.0 AppV 4.0.8 saheli    12/05/2023 mantis 26101
+    public static void browsePDFDocuments(Activity context, int requestCode) {
+
+        String[] mimeTypes =
+                {
+                        "application/pdf" //.pdf
+                };
+
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            intent.setType(mimeTypes.length == 1 ? mimeTypes[0] : "*/*");
+            if (mimeTypes.length > 0) {
+                intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+            }
+        } else {
+            String mimeTypesStr = "";
+            for (String mimeType : mimeTypes) {
+                mimeTypesStr += mimeType + "|";
+            }
+            intent.setType(mimeTypesStr.substring(0, mimeTypesStr.length() - 1));
+        }
+        context.startActivityForResult(Intent.createChooser(intent, "ChooseFile"), requestCode);
+    }
+
+    public static String getFilePathFromUri(Context context, Uri uri) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return getFilePathForQAndAbove(context, uri);
+        } else {
+            return getFilePathForBelowQ(context, uri);
+        }
+    }
+
+    private static String getFilePathForQAndAbove(Context context, Uri uri) {
+        String[] projection = {MediaStore.Images.Media.DISPLAY_NAME, MediaStore.Images.Media.RELATIVE_PATH};
+        try (Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                int displayNameIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DISPLAY_NAME);
+                int relativePathIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.RELATIVE_PATH);
+
+                String displayName = cursor.getString(displayNameIndex);
+                String relativePath = cursor.getString(relativePathIndex);
+
+                return new File(context.getExternalFilesDir(relativePath), displayName).getAbsolutePath();
+            }
+        }
+        return null;
+    }
+    private static String getFilePathForBelowQ(Context context, Uri uri) {
+        String[] projection = {MediaStore.Images.Media.DATA};
+        try (Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null)) {
+            if (cursor != null && cursor.moveToFirst()) {
+                int columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                return cursor.getString(columnIndex);
+            }
+        }
+        return null;
+    }    // rev NewFileUtils end 1.0 AppV 4.0.8 saheli    12/05/2023 mantis 26101
 }

@@ -116,4 +116,24 @@ class ShopActivityEntity {
     @ColumnInfo(name = "pros_id") // pros_id used as stage_id in pref.IsnewleadtypeforRuby and type of shop = 16
     var pros_id: String? = null
 
+    @ColumnInfo(name = "isnewShop")
+    var isnewShop = false
+
+    @ColumnInfo(name = "multi_contact_name")
+    var multi_contact_name: String? = null
+
+    @ColumnInfo(name = "multi_contact_number")
+    var multi_contact_number: String? = null
+
+    //Begin Rev 17 DashboardActivity AppV 4.0.8 Suman    24/04/2023 distanct+station calculation 25806
+    @ColumnInfo(name = "distFromProfileAddrKms")
+    var distFromProfileAddrKms: String? = null
+
+    @ColumnInfo(name = "stationCode")
+    var stationCode: String? = null
+    //In Station- 0
+    //Ex Station- 1
+    //Out Station- 2
+    //End of Rev 17 DashboardActivity AppV 4.0.8 Suman    24/04/2023 distanct+station calculation 25806
+
 }

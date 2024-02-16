@@ -1,7 +1,6 @@
 package com.prakashspicesfsm.features.attendance.api
 
-import com.prakashspicesfsm.features.attendance.model.AttendanceRequest
-import com.prakashspicesfsm.features.attendance.model.AttendanceResponse
+import com.prakashspicesfsm.features.attendance.model.*
 import io.reactivex.Observable
 
 /**
@@ -10,5 +9,13 @@ import io.reactivex.Observable
 class AttendanceListRepository(val apiService: AttendanceListApi) {
     fun getAttendanceList(attendanceRequest: AttendanceRequest?): Observable<AttendanceResponse> {
         return apiService.getAttendanceList(attendanceRequest)
+    }
+
+    fun getDayStartEndList(attendanceRequest: AttendanceRequest?): Observable<DayStartEndListResponse> {
+        return apiService.getDayStartEndListAPI(attendanceRequest)
+    }
+
+    fun getNotVisitedPartyList(inputRequest: InputRequest?): Observable<OutputResponse> {
+        return apiService.getPartyListNotVisited(inputRequest)
     }
 }
